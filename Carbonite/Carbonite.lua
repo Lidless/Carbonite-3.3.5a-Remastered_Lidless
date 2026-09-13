@@ -6573,6 +6573,9 @@ return "Interface\\TargetingFrame\\UI-RaidTargetingIcon_" .. ind
 end
 function Nx.Map:ScC1()
 Nx.Map.SCM=500
+if WorldMapFrame:IsShown() then
+return
+end
 local olC=GetCurrentMapContinent()
 if olC<0 then
 return
@@ -18171,6 +18174,10 @@ Nx.Tim:PrE("Quest UpdateIcons")
 end
 function Nx.Que:SBQDT()
 local Map=Nx.Map
+if WorldMapFrame:IsShown() then
+Nx.Tim:Sta("QScanBlizz",.9,self,self.SBQDT)
+return
+end
 local cMI=Map:GCMI()
 local maI=self.SBMI
 local scC=0
@@ -23674,12 +23681,6 @@ function Nx.Map:OBTW(but1)
 Nx.War:ToS()
 end
 function Nx.Com:SVM()
-local s1=format("A newer version of %s is available",NXTITLEFULL)
-local s2=format("Visit %s%s|cffffffff for an update",Nx.TXTBLUE,Nx.WeS)
-UIErrorsFrame:AddMessage(s2,1,1,1,1)
-UIErrorsFrame:AddMessage(s1,1,1,0,1)
-Nx.prt(s1)
-Nx.prt(s2)
 end
 function Nx.Map:CFZTLO(frm,x,y,w,h,xo,yo)
 x,y=self:GWP(self.MaI,x,y)
@@ -24654,9 +24655,7 @@ end
 for _,ci in ipairs(coN2) do
 for mi,maN in pairs(self.MaN[ci]) do
 Nx.MNTI1[maN]=self.CZ2I[ci][mi]
-if not Nx.MNTI1[maN] then
-Nx.prt("Unknown map name: %s (%s %s)",maN,ci,mi)
-else
+if Nx.MNTI1[maN] then
 Nx.MITN[Nx.MNTI1[maN]]=maN
 end
 end
@@ -25560,6 +25559,9 @@ HideUIPanel(WorldMapFrame)
 else
 local map=self:GeM(1)
 map:DWM()
+if map.Win1 then
+map.Win1:Show(false)
+end
 ShowUIPanel(WorldMapFrame)
 end
 end
@@ -25999,14 +26001,22 @@ f:SetScale(self.WMFS)
 f:SetPoint("TOPLEFT","WorldMapDetailFrame","TOPLEFT",0,0)
 f:EnableMouse(true)
 self:SWMI(1)
-local tip1=getglobal("WorldMapTooltip")
-if tip1 then
-tip1:SetParent(self.WMFP)
-tip1:SetFrameStrata("TOOLTIP")
-end
 local af=getglobal("WorldMapFrameAreaFrame")
 if af then
 af:Show()
+end
+end
+local tip1=getglobal("WorldMapTooltip")
+if tip1 then
+tip1:SetParent(getglobal("WorldMapFrame"))
+tip1:SetFrameStrata("TOOLTIP")
+end
+local isf=self.ISF1
+if isf then
+for n=1,(isf.Nex or 1)-1 do
+if isf[n] then
+isf[n]:Hide()
+end
 end
 end
 end
@@ -26064,10 +26074,6 @@ but1:SetPoint("TOPLEFT",mm,"TOPLEFT",x+54,y-54)
 but1:SetUserPlaced(true)
 end
 function Nx.Sec:OlM()
-local nam="ILQUD"
-NxData.NXGOpts[nam]=nil
-local s="\n|cffff4040This version is pretty old.\n|rVisit |cff40ff40" .. Nx.WeS .. "|r and check for a newer version."
-Nx.prt(s)
 end
 function Nx.Opt:NXCmdFavCartImport()
 Nx.Fav:CIN()
