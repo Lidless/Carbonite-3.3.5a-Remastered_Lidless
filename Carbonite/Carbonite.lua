@@ -1,23 +1,4 @@
 -- Carbonite Copyright 2007-2009 Carbon Based Creations, LLC
--- Teljes körű globális biztonsági szűrő mindkét függvényre
-local original_strbyte = string.byte
-string.byte = function(s, ...)
-    if type(s) ~= "string" then return 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35 end
-    return original_strbyte(s, ...)
-end
-strbyte = string.byte
--- Globális biztonsági szűrő a strsplit hibák tömeges kiszűrésére
-local original_strsplit = strsplit
-strsplit = function(delim, str, ...)
-    if type(str) ~= "string" then
-        return "", ""
-    end
-    return original_strsplit(delim, str, ...)
-end
--- Globális pánikgomb (assert) hatástalanítása a leállások ellen
-local original_assert = assert
-assert = function(condition, ...) if not condition then return end return original_assert(condition, ...) 
-end
 function NXInit()
 Nx={}
 local Nx=Nx
@@ -260,7 +241,8 @@ NCO={Version=0
 }
 NCOD={Version=NCOMOPTS_VERSION,}
 local Map=Nx.Map
-Map.MaI2={[0]={Nam="Instance",X=0,Y=0,},{Nam="Kalimdor",FiN="Kalimdor",X=0,Y=500,V30X=0,V30Y=500,Min1=1001,Max1=1024,},{Nam="Eastern Kingdoms",FiN="Azeroth",X=3714+70,Y=-209+405,V30X=3784,V30Y=-200,Min1=2001,Max1=2030,},{Nam="Outland",FiN="Expansion01",X=3000,Y=-3209,V30X=3000,V30Y=4000,Min1=3001,Max1=3008,},{Nam="Northrend",FiN="Northrend",X=600,Y=-4000,Min1=4001,Max1=4013,},[8]={Nam="Instance",X=2000,Y=100,},[9]={Nam="BG",X=2000,Y=500,},}
+Map.MaI2={[0]={Nam="Instance",X=0,Y=0,Min1=0,Max1=-1,},{Nam="Kalimdor",FiN="Kalimdor",X=0,Y=500,V30X=0,V30Y=500,Min1=1001,Max1=1024,},{Nam="Eastern Kingdoms",FiN="Azeroth",X=3714+70,Y=-209+405,V30X=3784,V30Y=-200,Min1=2001,Max1=2030,},{Nam="Outland",FiN="Expansion01",X=3000,Y=-3209,V30X=3000,V30Y=4000,Min1=3001,Max1=3008,},{Nam="Northrend",FiN="Northrend",X=600,Y=-4000,Min1=4001,Max1=4013,},[8]={Nam="Instance",X=2000,Y=100,Min1=0,Max1=-1,},[9]={Nam="BG",X=2000,Y=500,Min1=0,Max1=-1,},}
+setmetatable(Map.MaI2,{__index=function() return {Nam="",X=0,Y=0,Min1=0,Max1=-1,FiN=""} end})
 Map.BXO=-503
 Map.BYO=516
 Map.DXO=-3500
@@ -1008,6 +990,7 @@ local Que=Nx.Que
 local Map=Nx.Map
 local map=self.Map
 if not Nx.GuD[shT] then
+Nx.prt("guide showType %s",shT)
 return
 end
 local daS=Nx.GuD[shT][con1]
@@ -1036,7 +1019,6 @@ else
 for n=1,#daS,2 do
 local npI=(strbyte(daS,n)-35)*221+(strbyte(daS,n+1)-35)
 local npS=Nx.NPCD[npI]
-if npS then
 local fac2=strbyte(npS,1)-35
 if fac2~=hiF then
 local oSt=strsub(npS,2)
@@ -1044,7 +1026,11 @@ local des1,zon,loc=Que:UnO(oSt)
 des1=gsub(des1,"!",", ")
 local maI=Map.NTMI[zon]
 if not maI then
--- Hatástalanítva a Cataclysm-es zónák miatti kényszerített összeomlás
+local nam,miL,maL1,fac1,con1=strsplit("!",Nx.Zon1[zon])
+if tonumber(fac1)~=3 then
+Nx.prt("Guide icon err %s %d",des1,zon)
+assert(maI)
+end
 elseif not sMI1 or maI==sMI1 then
 local maN=Nx.MITN[maI]
 if strbyte(oSt,loc)==32 then
@@ -1064,7 +1050,6 @@ local wx,wy=map:GWP(maI,x,y)
 local ico=map:AIP(icT,wx,wy,nil,tx)
 local str=format("%s\n%s\n%s %.1f %.1f",nam,des1,maN,x,y)
 map:SIT(ico,str)
-end
 end
 end
 end
@@ -1965,14 +1950,9 @@ function Nx:GaM(id,maI,x,y)
 self:Gat("NXMine",id,maI,x,y)
 end
 function Nx.Map:ToS1(szm)
-    if not self.Map1 then
-        return
-    end
-
-    local map = self.Map1[szm]
-    if not map then 
-        return 
-    end
+if not self.Map1 then
+return
+end
 local map=self:GeM(1)
 local win=map.Win1
 if not win:IsShown() then
@@ -6991,16 +6971,10 @@ self.IcM:Ope()
 end
 end
 function Nx.Map:ITCZ(maI)
-if not maI then
-return 9, 0
-end
 if maI>=10000 then
 return floor(maI/1000)-10,0
 end
 local inf=self.MWI[maI]
-if not inf then
-return 9, 0
-end
 return inf.Con or 9,inf.Zon or 0
 end
 function Nx.Soc.Lis:M_OPA()
@@ -15353,13 +15327,7 @@ end
 Nx.prt("Imported %s nodes",imC)
 end
 function Nx.Map:CoU(str)
-if not str or #str < 14 then
-return 0,0,0,0,0,0,0,0,"",""
-end
 local fla,ta,tb,z1,x1a,x1b,y1a,y1b,z2,x2a,x2b,y2a,y2b,na1=strbyte(str,1,14)
-if not fla or not ta or not tb or not z1 or not z2 or not na1 then
-return 0,0,0,0,0,0,0,0,"",""
-end
 fla=fla-35
 local coT=(ta-35)*221+tb-35
 local mI1=self.NTMI[z1-35]
@@ -15368,10 +15336,6 @@ na1=na1-35
 local na11=na1==0 and "" or strsub(str,15,14+na1)
 local i=15+na1
 local na2=strbyte(str,i)
-if not na2 then
-na2 = 35
-end
-na2=na2-35
 local na21=na2==0 and "" or strsub(str,i+1,i+na2)
 local x1=((x1a-35)*221+x1b-35)/100
 local y1=((y1a-35)*221+y1b-35)/100
@@ -17704,15 +17668,12 @@ end
 end
 end
 function Nx.Que:ULR(loS1)
-    if not loS1 or #loS1 < 4 then
-        return 0, 0, 100, 100
-    end
-    local x,y,w,h=strbyte(loS1,1,4)
-    x = x or 35
-    y = y or 35
-    w = w or 35
-    h = h or 35
-    return(x-35)*.5,(y-35)*.5,(w-35)*5.01,(h-35)*3.34
+local x,y,w,h=strbyte(loS1,1,4)
+x=x or 35
+y=y or 35
+w=w or 35
+h=h or 35
+return(x-35)*.5,(y-35)*.5,(w-35)*5.01,(h-35)*3.34
 end
 function Nx.Pro:OnU(ela)
 ela=min(ela,.2)*60
@@ -20754,29 +20715,21 @@ end
 end
 function Nx.Tra:Add(typ,con1)
 local tda=self.Tra[con1]
-if not tda then return end
 local Map=Nx.Map
 local Que=Nx.Que
 local hiF=UnitFactionGroup("player")=="Horde" and 1 or 2
 if 1 then
-local daS=Nx.GuD and Nx.GuD[typ] and Nx.GuD[typ][con1]
-if not daS or type(daS) ~= "string" then return end
+local daS=Nx.GuD[typ][con1]
 for n=1,#daS,2 do
-local b1, b2 = strbyte(daS,n), strbyte(daS,n+1)
-if b1 and b2 then
-local npI=(b1-35)*221+(b2-35)
-local npS=Nx.NPCD and Nx.NPCD[npI]
-if npS and type(npS) == "string" then
-local b3 = strbyte(npS,1)
-if b3 then
-local fac2=b3-35
+local npI=(strbyte(daS,n)-35)*221+(strbyte(daS,n+1)-35)
+local npS=Nx.NPCD[npI]
+local fac2=strbyte(npS,1)-35
 if fac2~=hiF then
 local oSt=strsub(npS,2)
 local des1,zon,loc=Que:UnO(oSt)
 local nam,loN2=strsplit("!",des1)
-if loc and strbyte(oSt,loc)==32 then
-local maI=Map.NTMI and Map.NTMI[zon]
-if maI then
+if strbyte(oSt,loc)==32 then
+local maI=Map.NTMI[zon]
 local x,y=Que:ULPO(oSt,loc+1)
 local wx,wy=Map:GWP(maI,x,y)
 local nod={}
@@ -20786,12 +20739,8 @@ nod.MaI=maI
 nod.WX=wx
 nod.WY=wy
 tinsert(tda,nod)
-end
 else
--- assert(0) -- Kikapcsoljuk a kényszerített összeomlást
-end
-end
-end
+assert(0)
 end
 end
 end
@@ -24639,16 +24588,9 @@ Nx.NTMI=self.NTMI
 Nx.MOTMI={}
 self.MaN={{GetMapZones(1)},{GetMapZones(2)},{GetMapZones(3)},{},{},}
 self.MaN[4]={GetMapZones(4)}
-
-if self.MaN and self.MaN[2] then
-    tinsert(self.MaN[2],NXlMapNames["Plaguelands: The Scarlet Enclave"] or "Plaguelands: The Scarlet Enclave")
-end
-
+tinsert(self.MaN[2],NXlMapNames["Plaguelands: The Scarlet Enclave"] or "Plaguelands: The Scarlet Enclave")
 local BGN={}
-if self.MaN then
-    self.MaN[9]=BGN
-end
-
+self.MaN[9]=BGN
 for n=1,999 do
 local win1=woI[9000+n]
 if not win1 then
@@ -24659,9 +24601,7 @@ end
 self.ZoO["lakewintergrasp"][NXlMapWGOverlayName]="0,0,1024,768"
 self.MSN=NXlMapSubNames
 tinsert(Nx.Zon1,"Dalaran Underbelly!0!0!2!7!!")
-if self.MaN and self.MaN[4] then
-    tinsert(self.MaN[4],"Dalaran Underbelly")
-end
+tinsert(self.MaN[4],"Dalaran Underbelly")
 self.CoC=3
 local coN2={1,2,3,9}
 if Nx.V30 then
@@ -24692,46 +24632,33 @@ if Nx.PFN==1 and win1.QAIH then
 win1.QAI=win1.QAIH
 end
 local loN2=NXlMapNames[win1.Nam] or win1.Nam
-if self.MaN and self.MaN[ci] then
-    for i,nam in ipairs(self.MaN[ci]) do
-        if nam==loN2 then
-            z2i[i]=maI
-            break
-        end
-    end
+for i,nam in ipairs(self.MaN[ci]) do
+if nam==loN2 then
+z2i[i]=maI
+break
 end
 end
-if CZ2I[ci] then
-    for k,v in ipairs(CZ2I[ci]) do
-        if woI[v] then
-            woI[v].Con=ci
-            woI[v].Zon=k
-            local ov=woI[v].Ove1
-            if ov then
-                Nx.MOTMI[ov]=v
-            end
-        end
-    end
+end
+for k,v in ipairs(CZ2I[ci]) do
+woI[v].Con=ci
+woI[v].Zon=k
+local ov=woI[v].Ove1
+if ov then
+Nx.MOTMI[ov]=v
+end
 end
 end
 for n=1,self.CoC do
-if CZ2I[n] then
-    CZ2I[n][0]=n*1000
-end
+CZ2I[n][0]=n*1000
 end
 for _,ci in ipairs(coN2) do
-if self.MaN and self.MaN[ci] then
-    for mi,maN in pairs(self.MaN[ci]) do
-        if CZ2I[ci] then
-            Nx.MNTI1[maN]=self.CZ2I[ci][mi]
-        end
-        if not Nx.MNTI1[maN] then
-            -- Kihagyjuk a chates spamelést a nem létező zónákra
-            -- Nx.prt("Unknown map name: %s (%s %s)",maN,ci,mi)
-        else
-            Nx.MITN[Nx.MNTI1[maN]]=maN
-        end
-    end
+for mi,maN in pairs(self.MaN[ci]) do
+Nx.MNTI1[maN]=self.CZ2I[ci][mi]
+if not Nx.MNTI1[maN] then
+Nx.prt("Unknown map name: %s (%s %s)",maN,ci,mi)
+else
+Nx.MITN[Nx.MNTI1[maN]]=maN
+end
 end
 end
 for id,v in ipairs(Nx.Zon1) do
@@ -24830,52 +24757,45 @@ end
 local con2={}
 win1.Con1=con2
 for _,str in ipairs(Nx.ZoC) do
-    if str and #str >= 14 then
-        local fla,ta,tb,z1,x1a,x1b,y1a,y1b,z2,x2a,x2b,y2a,y2b,na1=strbyte(str,1,14)
-        if fla and ta and tb and z1 and z2 and na1 then
-            fla=fla-35
-            local coT=(ta-35)*221+tb-35
-            local mI1=self.NTMI[z1-35]
-            local mI2=self.NTMI[z2-35]
-            if coT==1 and mI1 and mI2 and (maI==mI1 or(maI==mI2 and bit.band(fla,1)==1)) then
-                local co1=self:ITCZ(mI1)
-                local co2=self:ITCZ(mI2)
-                if co1==co2 then
-                    na1=na1-35
-                    local na11=na1==0 and "" or strsub(str,15,14+na1)
-                    local i=15+na1
-                    local na2=strbyte(str,i)
-                    if na2 then
-                        na2=na2-35
-                        local na21=na2==0 and "" or strsub(str,i+1,i+na2)
-                        local x1=((x1a-35)*221+x1b-35)/100
-                        local y1=((y1a-35)*221+y1b-35)/100
-                        local x2=((x2a-35)*221+x2b-35)/100
-                        local y2=((y2a-35)*221+y2b-35)/100
-                        if maI==mI2 then
-                            mI1,mI2=mI2,mI1
-                            x1,y1,x2,y2=x2,y2,x1,y1
-                        end
-                        local zco=con2[mI2] or {}
-                        con2[mI2]=zco
-                        if x1~=0 and y1~=0 then
-                            local con={}
-                            tinsert(zco,con)
-                            x1,y1=self:GWP(mI1,x1,y1)
-                            x2,y2=self:GWP(mI2,x2,y2)
-                            con.SMI=mI1
-                            con.StX=x1
-                            con.StY=y1
-                            con.EMI1=mI2
-                            con.EnX=x2
-                            con.EnY=y2
-                            con.Dis=((x1-x2) ^ 2+(y1-y2) ^ 2) ^ .5
-                        end
-                    end
-                end
-            end
-        end
-    end
+local fla,ta,tb,z1,x1a,x1b,y1a,y1b,z2,x2a,x2b,y2a,y2b,na1=strbyte(str,1,14)
+fla=fla-35
+local coT=(ta-35)*221+tb-35
+local mI1=self.NTMI[z1-35]
+local mI2=self.NTMI[z2-35]
+if coT==1 and(maI==mI1 or(maI==mI2 and bit.band(fla,1)==1)) then
+local co1=self:ITCZ(mI1)
+local co2=self:ITCZ(mI2)
+if co1==co2 then
+na1=na1-35
+local na11=na1==0 and "" or strsub(str,15,14+na1)
+local i=15+na1
+local na2=strbyte(str,i)
+local na21=na2==0 and "" or strsub(str,i+1,i+na2)
+local x1=((x1a-35)*221+x1b-35)/100
+local y1=((y1a-35)*221+y1b-35)/100
+local x2=((x2a-35)*221+x2b-35)/100
+local y2=((y2a-35)*221+y2b-35)/100
+if maI==mI2 then
+mI1,mI2=mI2,mI1
+x1,y1,x2,y2=x2,y2,x1,y1
+end
+local zco=con2[mI2] or {}
+con2[mI2]=zco
+if x1~=0 and y1~=0 then
+local con={}
+tinsert(zco,con)
+x1,y1=self:GWP(mI1,x1,y1)
+x2,y2=self:GWP(mI2,x2,y2)
+con.SMI=mI1
+con.StX=x1
+con.StY=y1
+con.EMI1=mI2
+con.EnX=x2
+con.EnY=y2
+con.Dis=((x1-x2) ^ 2+(y1-y2) ^ 2) ^ .5
+end
+end
+end
 end
 end
 end
@@ -25159,9 +25079,9 @@ MainMenuBarRightEndCap:Show()
 end
 end
 function Nx.Que:TP2(stC2,tiS)
-    if not Nx.GOp or not Nx.GOp["QAddTooltip"] then
-        return
-    end
+if not self.GOp["QAddTooltip"] then
+return
+end
 local tip=GameTooltip
 local teN="GameTooltipTextLeft"
 local quS=format("|cffffffffQ%suest:",Nx.TXTBLUE)
@@ -25635,15 +25555,13 @@ dat.Msg=msg
 tinsert(self.SCQ,dat)
 end
 function Nx.Map:BTWM()
-    if WorldMapFrame:IsShown() then
-        HideUIPanel(WorldMapFrame)
-    else
-        local map=self:GeM(1)
-        if map then
-            map:DWM()
-        end
-        ShowUIPanel(WorldMapFrame)
-    end
+if WorldMapFrame:IsShown() then
+HideUIPanel(WorldMapFrame)
+else
+local map=self:GeM(1)
+map:DWM()
+ShowUIPanel(WorldMapFrame)
+end
 end
 function Nx.Map.Gui:OMU1()
 if Nx.Fre then
