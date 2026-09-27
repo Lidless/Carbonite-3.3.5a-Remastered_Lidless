@@ -1019,6 +1019,7 @@ else
 for n=1,#daS,2 do
 local npI=(strbyte(daS,n)-35)*221+(strbyte(daS,n+1)-35)
 local npS=Nx.NPCD[npI]
+if npS then
 local fac2=strbyte(npS,1)-35
 if fac2~=hiF then
 local oSt=strsub(npS,2)
@@ -1026,11 +1027,6 @@ local des1,zon,loc=Que:UnO(oSt)
 des1=gsub(des1,"!",", ")
 local maI=Map.NTMI[zon]
 if not maI then
-local nam,miL,maL1,fac1,con1=strsplit("!",Nx.Zon1[zon])
-if tonumber(fac1)~=3 then
-Nx.prt("Guide icon err %s %d",des1,zon)
-assert(maI)
-end
 elseif not sMI1 or maI==sMI1 then
 local maN=Nx.MITN[maI]
 if strbyte(oSt,loc)==32 then
@@ -1050,6 +1046,7 @@ local wx,wy=map:GWP(maI,x,y)
 local ico=map:AIP(icT,wx,wy,nil,tx)
 local str=format("%s\n%s\n%s %.1f %.1f",nam,des1,maN,x,y)
 map:SIT(ico,str)
+end
 end
 end
 end
@@ -7600,13 +7597,12 @@ cna=self:GWCI(coN)
 if not cna then
 break
 end
-local zoN1=1
-while true do
+local maxZ1=self.MaN[coN] and #self.MaN[coN] or 0
+for zoN1=1,maxZ1 do
 zna,zx,zy,zw,zh=self:GWZI(coN,zoN1)
-if not zx then
-break
-end
+if zx then
 local maI=self:CZ2MI(coN,zoN1)
+if maI and self.MWI[maI] then
 local nxz=Nx.MITN1[maI] or 0
 local col,inS=self:GMND(maI)
 local tiS=format("%s, %s%s (%s)",cna,col,zna,inS)
@@ -7642,17 +7638,28 @@ else
 tinsert(qua1,spo)
 end
 spo.MaI=maI
-local wx,wy=self:GWP(maI,zx,zy)
-spo.WX1=wx
-spo.WY1=wy
+local wx1,wy1=self:GWP(maI,zx,zy)
 zw=zw/1002*100
 zh=zh/668*100
-local wx,wy=self:GWP(maI,zx+zw,zy+zh)
-spo.WX2=wx
-spo.WY2=wy
+local wx2,wy2=self:GWP(maI,zx+zw,zy+zh)
+if wx1<=wx2 then
+spo.WX1=wx1
+spo.WX2=wx2
+else
+spo.WX1=wx2
+spo.WX2=wx1
+end
+if wy1<=wy2 then
+spo.WY1=wy1
+spo.WY2=wy2
+else
+spo.WY1=wy2
+spo.WY2=wy1
+end
 spo.NTB=tiS
 end
-zoN1=zoN1+1
+end
+end
 end
 end
 end
@@ -12906,6 +12913,7 @@ local daS=Nx.GuD["Flight Master"][con1]
 for n=1,#daS,2 do
 local npI=(strbyte(daS,n)-35)*221+(strbyte(daS,n+1)-35)
 local npS=Nx.NPCD[npI]
+if npS then
 local fac2=strbyte(npS,1)-35
 if fac2~=hiF then
 local oSt=strsub(npS,2)
@@ -12920,6 +12928,7 @@ local wx,wy=Map:GWP(maI,x,y)
 return nam,wx,wy
 else
 assert(0)
+end
 end
 end
 end
@@ -13124,16 +13133,22 @@ local con4=Nx.FlC
 for n=1,#con4,6 do
 local a1,a2,b1,b2,c1,c2=strbyte(con4,n,n+5)
 local i=(a1-35)*221+a2-35
-local oSt=strsub(Nx.NPCD[i],2)
+local npS1=Nx.NPCD[i]
+if npS1 then
+local oSt=strsub(npS1,2)
 local des1,zon,loc=Que:UnO(oSt)
 local nam=strsplit("!",des1)
 if nam==sNPCN then
 local i=(b1-35)*221+b2-35
-local oSt=strsub(Nx.NPCD[i],2)
+local npS2=Nx.NPCD[i]
+if npS2 then
+local oSt=strsub(npS2,2)
 local des1,zon,loc=Que:UnO(oSt)
 local nam=strsplit("!",des1)
 if nam==dNPCN then
 return((c1-35)*221+c2-35)/10
+end
+end
 end
 end
 end
@@ -14021,6 +14036,7 @@ else
 for n=1,#daS,2 do
 local npI=(strbyte(daS,n)-35)*221+(strbyte(daS,n+1)-35)
 local npS=Nx.NPCD[npI]
+if npS then
 local fac2=strbyte(npS,1)-35
 if fac2~=hiF then
 local oSt=strsub(npS,2)
@@ -14051,6 +14067,7 @@ clD=dis
 clo1=npI
 cMI1=maI
 clX,clY=wx,wy
+end
 end
 end
 end
@@ -15338,7 +15355,7 @@ local mI2=self.NTMI[z2-35]
 na1=na1-35
 local na11=na1==0 and "" or strsub(str,15,14+na1)
 local i=15+na1
-local na2=strbyte(str,i)
+local na2=strbyte(str,i) or 0
 local na21=na2==0 and "" or strsub(str,i+1,i+na2)
 local x1=((x1a-35)*221+x1b-35)/100
 local y1=((y1a-35)*221+y1b-35)/100
@@ -20730,6 +20747,7 @@ local daS=Nx.GuD[typ][con1]
 for n=1,#daS,2 do
 local npI=(strbyte(daS,n)-35)*221+(strbyte(daS,n+1)-35)
 local npS=Nx.NPCD[npI]
+if npS then
 local fac2=strbyte(npS,1)-35
 if fac2~=hiF then
 local oSt=strsub(npS,2)
@@ -20746,8 +20764,7 @@ nod.MaI=maI
 nod.WX=wx
 nod.WY=wy
 tinsert(tda,nod)
-else
-assert(0)
+end
 end
 end
 end
@@ -24640,12 +24657,19 @@ break
 end
 end
 end
-for k,v in ipairs(CZ2I[ci]) do
+local maxK1=0
+for k in pairs(CZ2I[ci]) do
+if k>maxK1 then maxK1=k end
+end
+for k=1,maxK1 do
+local v=CZ2I[ci][k]
+if v and woI[v] then
 woI[v].Con=ci
 woI[v].Zon=k
 local ov=woI[v].Ove1
 if ov then
 Nx.MOTMI[ov]=v
+end
 end
 end
 end
@@ -24768,7 +24792,7 @@ if co1==co2 then
 na1=na1-35
 local na11=na1==0 and "" or strsub(str,15,14+na1)
 local i=15+na1
-local na2=strbyte(str,i)
+local na2=strbyte(str,i) or 0
 local na21=na2==0 and "" or strsub(str,i+1,i+na2)
 local x1=((x1a-35)*221+x1b-35)/100
 local y1=((y1a-35)*221+y1b-35)/100
