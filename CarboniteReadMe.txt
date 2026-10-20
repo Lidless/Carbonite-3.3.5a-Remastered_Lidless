@@ -601,10 +601,9 @@ Example:
 
 GRIMFALL FORK - KNOWN ISSUES (added by custom fork maintainer, 2026-10-20)
 
-- Caverns of Time (Tanaris) Andormu positions: Caverns of Time has two
-  Andormu NPCs (an adult and a child) at different locations, but the
-  quest database stored the adult's position for every Andormu quest.
-  FIXED for "To The Master's Lair", which now points to the child
-  Andormu. The other Andormu quests (The Caverns of Time, Old
-  Hillsbrad, Return to Andormu, The Black Morass, Hero of the Brood)
-  still point to the adult until verified in-game.
+- Caverns of Time (Tanaris) quest NPCs - FIXED: Caverns of Time has two
+  Andormu NPCs (an adult and a child), but the quest database stored the
+  adult's position for every Andormu quest. All Andormu quests now point
+  to the child Andormu. Erozion and Sa'at (inside the Caverns of Time
+  instances, which are closed on Grimfall) had no stored position; they
+  now point to the Escape from Durnholde and Black Morass portals.
