@@ -5009,7 +5009,7 @@ Nx.Que.Lis:AtF()
 end
 function Nx.Map:CWHT(wx,wy,qua1)
 for n,spo in ipairs(qua1) do
-if wx>=spo.WX1 and wx<=spo.WX2 and wy>=spo.WY1 and wy<=spo.WY2 then
+if wx>=spo.WX1 and wx<=spo.WX2 and wy>=spo.WY1 and wy<=spo.WY2 and spo.MaI~=1026 and spo.MaI~=1027 then
 local cuI=self:GCMI()
 cuI=self.MWI[cuI].L1I or cuI
 if spo.MaI~=cuI then
@@ -21285,6 +21285,16 @@ function Nx.NXMiniMapBut:M_OSC1()
 Nx.Com.Lis:Ope()
 end
 function Nx.Map:CWH(wx,wy)
+local rid=self:GRMI()
+if rid==1026 or rid==1027 then
+if self.MaI~=1026 and self.MaI~=1027 and not self.CoTR then
+self.CoTR=true
+SetMapToCurrentZone()
+end
+self.WHTS=false
+return
+end
+self.CoTR=nil
 if self.IMI then
 if wx>=self.IMWX1 and wx<=self.IMWX2 and wy>=self.IMWY1 and wy<=self.IMWY2 then
 if self.IMI~=self.MaI then
