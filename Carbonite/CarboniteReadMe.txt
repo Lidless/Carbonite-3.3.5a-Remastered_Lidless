@@ -595,3 +595,20 @@ Example:
 
 
 
+
+
+----------------------------------------------------------
+
+GRIMFALL FORK - KNOWN ISSUES (added by custom fork maintainer, 2026-10-20)
+
+- Caverns of Time (Tanaris) quest-giver positions: the NPC coordinate
+  database stores a single packed position per NPC name, shared across
+  all quest entries referencing that name. Caverns of Time has TWO
+  separate "Andormu" NPCs (an adult version and a younger "child"
+  version) at different in-world locations, but only one stored
+  coordinate exists for the name "Andormu". As a result, the in-world
+  waypoint/distance helper for some quests that involve Andormu (for
+  example "To The Master's Lair", quest id 20568) points to the wrong
+  Andormu, while the native Blizzard quest marker (the "?" icon) shows
+  the correct one. Not yet fixed - needs the packed coordinate format
+  decoded and a second, quest-specific entry added for the child Andormu.

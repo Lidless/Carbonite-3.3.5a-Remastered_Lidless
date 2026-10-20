@@ -12,6 +12,10 @@ Crashes on custom zones — added nil-guards to coordinate decoding (Nx.Que:ULR)
 Version nag messages ("a newer version is available", "this version is pretty old") — silenced.
 Native world map (Alt+M) became completely unclickable with Carbonite loaded — root cause was a background timer (Nx.Que:SBQDT) firing every 0.9 seconds to scan quest data across zones, which kept changing the global map state (SetMapZoom) regardless of whether the native Blizzard map was open. This collided with the native map's own update cycle and randomly broke POI button clicks/tooltips. Fix: this background scan now pauses while the native map is open, and resumes where it left off once you close it.
 WorldMapTooltip getting stuck on the wrong parent frame — after Carbonite's own map-embedding (AWM/DWM), the native tooltip now always gets reset to the correct WorldMapFrame parent and TOOLTIP strata whenever the native map opens.
+Caverns of Time (Tanaris) map — all three layers (entrance, portal room, inside) showed the real Tanaris terrain or the Kalimdor overview instead of the drawn Caverns of Time map, and quest distances jumped between layers. Fix: the portal room and the inside layer each got their own map entry (1026 / 1027) with geometry taken from WorldMapArea.dbc, an explicit zone-index binding (Grimfall's classless hero-class start zone shares the "Caverns of Time" name), the continent-overview and terrain-tile layers are suppressed there, and both entries are flagged as city maps so the composite map tiles render.
+Known issues
+Caverns of Time quest-giver positions — Carbonite's NPC coordinate database stores one position per NPC name, and Caverns of Time has two different "Andormu" NPCs (adult and child). For some quests (e.g. "To The Master's Lair", id 20568) Carbonite's waypoint points to the wrong Andormu; the native "?" quest marker is correct. Not fixed yet.
+Feedback: please use GitHub issues.
 Installation
 
 Option A — download the whole repo:
