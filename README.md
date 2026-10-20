@@ -14,7 +14,7 @@ Native world map (Alt+M) became completely unclickable with Carbonite loaded —
 WorldMapTooltip getting stuck on the wrong parent frame — after Carbonite's own map-embedding (AWM/DWM), the native tooltip now always gets reset to the correct WorldMapFrame parent and TOOLTIP strata whenever the native map opens.
 Caverns of Time (Tanaris) map — all three layers (entrance, portal room, inside) showed the real Tanaris terrain or the Kalimdor overview instead of the drawn Caverns of Time map, and quest distances jumped between layers. Fix: the portal room and the inside layer each got their own map entry (1026 / 1027) with geometry taken from WorldMapArea.dbc, an explicit zone-index binding (Grimfall's classless hero-class start zone shares the "Caverns of Time" name), the continent-overview and terrain-tile layers are suppressed there, and both entries are flagged as city maps so the composite map tiles render.
 Known issues
-Caverns of Time quest-giver positions — Carbonite's NPC coordinate database stores one position per NPC name, and Caverns of Time has two different "Andormu" NPCs (adult and child). For some quests (e.g. "To The Master's Lair", id 20568) Carbonite's waypoint points to the wrong Andormu; the native "?" quest marker is correct. Not fixed yet.
+Caverns of Time Andormu positions — Caverns of Time has two Andormu NPCs (adult and child), but Carbonite's quest database had the adult's position for every Andormu quest. "To The Master's Lair" now correctly points to the child Andormu. The other Andormu quests (The Caverns of Time, Old Hillsbrad, Return to Andormu, The Black Morass, Hero of the Brood) still point to the adult until verified in-game.
 Feedback: please use GitHub issues.
 Installation
 
