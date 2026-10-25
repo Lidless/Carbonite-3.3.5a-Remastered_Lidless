@@ -19988,6 +19988,104 @@ local qId=bit.rshift(i,16)
 Nx.Que:Aba(qIn,qId)
 end
 end
+function Nx.DLog(cat,key,txt)
+if not NxData then
+return
+end
+local d=NxData.NXDataIssues
+if type(d)~="table" or type(d.L)~="table" then
+d={L={},S={}}
+NxData.NXDataIssues=d
+end
+local k=cat..":"..tostring(key)
+if d.S[k] then
+return
+end
+if #d.L>=300 then
+return
+end
+d.S[k]=true
+tinsert(d.L,format("%s  [%s] %s",date("%Y-%m-%d %H:%M"),cat,txt))
+if Nx.DIF and Nx.DIF:IsShown() then
+Nx.DIRef()
+end
+end
+function Nx.DIRef()
+local f=Nx.DIF
+if not f then
+return
+end
+local d=NxData and NxData.NXDataIssues
+local l=d and d.L
+local n=l and #l or 0
+f.Tit:SetText(format("Carbonite - Data Issues (%d)",n))
+if n==0 then
+f.Edi:SetText("No data issues recorded.\n\nCarbonite notes here the cases where the game gave it no data (for example a quest with no map point on a map) and it skipped them instead of showing an error.")
+else
+f.Edi:SetText(table.concat(l,"\n"))
+end
+f.Edi:SetCursorPosition(0)
+end
+function Nx.DIShow()
+local f=Nx.DIF
+if not f then
+f=CreateFrame("Frame","NxDataIssuesFrame",UIParent)
+Nx.DIF=f
+f:SetWidth(620)
+f:SetHeight(380)
+f:SetPoint("CENTER")
+f:SetFrameStrata("DIALOG")
+f:SetToplevel(true)
+f:SetMovable(true)
+f:EnableMouse(true)
+f:SetClampedToScreen(true)
+f:RegisterForDrag("LeftButton")
+f:SetScript("OnDragStart",function(s) s:StartMoving() end)
+f:SetScript("OnDragStop",function(s) s:StopMovingOrSizing() end)
+f:SetBackdrop({bgFile="Interface\\DialogFrame\\UI-DialogBox-Background",edgeFile="Interface\\DialogFrame\\UI-DialogBox-Border",tile=true,tileSize=32,edgeSize=32,insets={left=11,right=12,top=12,bottom=11}})
+tinsert(UISpecialFrames,"NxDataIssuesFrame")
+local t=f:CreateFontString(nil,"ARTWORK","GameFontNormal")
+t:SetPoint("TOP",0,-18)
+f.Tit=t
+local h=f:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall")
+h:SetPoint("TOPLEFT",22,-40)
+h:SetText("Select the text and press Ctrl+C to copy it.")
+local c=CreateFrame("Button",nil,f,"UIPanelCloseButton")
+c:SetPoint("TOPRIGHT",-6,-6)
+local sf=CreateFrame("ScrollFrame","NxDataIssuesScroll",f,"UIPanelScrollFrameTemplate")
+sf:SetPoint("TOPLEFT",22,-58)
+sf:SetPoint("BOTTOMRIGHT",-40,50)
+local e=CreateFrame("EditBox",nil,sf)
+e:SetMultiLine(true)
+e:SetAutoFocus(false)
+e:SetFontObject(ChatFontNormal)
+e:SetWidth(550)
+e:SetScript("OnEscapePressed",function(s) s:ClearFocus() f:Hide() end)
+e:SetScript("OnTextChanged",function(s,usr) if usr then Nx.DIRef() end end)
+sf:SetScrollChild(e)
+f.Edi=e
+local b=CreateFrame("Button",nil,f,"UIPanelButtonTemplate")
+b:SetWidth(100)
+b:SetHeight(22)
+b:SetPoint("BOTTOMLEFT",20,18)
+b:SetText("Clear")
+b:SetScript("OnClick",function()
+NxData.NXDataIssues={L={},S={}}
+Nx.DIRef()
+end)
+local b2=CreateFrame("Button",nil,f,"UIPanelButtonTemplate")
+b2:SetWidth(100)
+b2:SetHeight(22)
+b2:SetPoint("BOTTOMRIGHT",-20,18)
+b2:SetText("Close")
+b2:SetScript("OnClick",function() f:Hide() end)
+end
+Nx.DIRef()
+f:Show()
+end
+function Nx.NXMiniMapBut:M_ODI()
+Nx.DIShow()
+end
 function Nx.NXMiniMapBut:Ini()
 local opt=Nx:GGO()
 local f=NXMiniMapBut
@@ -19999,6 +20097,7 @@ self.Men=men
 men:AdI1(0,"Help",self.M_OSH,self)
 men:AdI1(0,"Options",self.M_OO,self)
 men:AdI1(0,"Show Map",self.M_OSM,self)
+men:AdI1(0,"Show Data Issues",self.M_ODI,self)
 if not Nx.Fre then
 men:AdI1(0,"Show Combat Graph",self.M_OSC,self)
 men:AdI1(0,"Show Events",self.M_OSE,self)
@@ -21252,6 +21351,9 @@ local lbC=GetNumQuestLeaderBoards(qi)
 for i=1,lbC do
 que[3+i]=que[2]
 end
+else
+local w=Map.MWI[maI]
+Nx.DLog("Quest POI",id.."@"..maI,format("Quest %d \"%s\" has no map point on %s (map %d)",id,GetQuestLogTitle(qi) or "?",w and w.Nam or "?",maI))
 end
 end
 end
