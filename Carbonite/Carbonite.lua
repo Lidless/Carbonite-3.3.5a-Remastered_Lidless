@@ -14712,6 +14712,10 @@ tip:AddLine("Right click for Menu",1,1,1,1)
 if not mmo then
 tip:AddLine("Shift drag to move",1,1,1,1)
 end
+local new=Nx.DINew and Nx.DINew() or 0
+if new>0 then
+tip:AddLine(format("! %d new data issue(s) - right click > Show Data Issues",new),1,.3,.3,1)
+end
 tip:AppendText("")
 end
 function Nx.Map:SIM(maI)
@@ -20007,7 +20011,45 @@ end
 d.S[k]=true
 tinsert(d.L,format("%s  [%s] %s",date("%Y-%m-%d %H:%M"),cat,txt))
 if Nx.DIF and Nx.DIF:IsShown() then
+d.Seen=#d.L
 Nx.DIRef()
+end
+Nx.DIUpd()
+end
+function Nx.DINew()
+local d=NxData and NxData.NXDataIssues
+if type(d)~="table" or type(d.L)~="table" then
+return 0
+end
+return max(#d.L-(d.Seen or 0),0)
+end
+function Nx.DIUpd()
+local new=Nx.DINew()
+local ite=Nx.NXMiniMapBut.DIIte
+if ite then
+if new>0 then
+ite:SetText(format("|cffff4040!|r Show Data Issues |cffff4040(%d new)|r",new))
+else
+ite:SetText("Show Data Issues")
+end
+end
+local b=NXMiniMapBut
+if not b then
+return
+end
+local fs=Nx.DIBadge
+if not fs then
+fs=b:CreateFontString(nil,"OVERLAY")
+fs:SetFont(STANDARD_TEXT_FONT,18,"OUTLINE")
+fs:SetTextColor(1,.25,.25)
+fs:SetText("!")
+fs:SetPoint("TOPRIGHT",b,"TOPRIGHT",2,2)
+Nx.DIBadge=fs
+end
+if new>0 then
+fs:Show()
+else
+fs:Hide()
 end
 end
 function Nx.DIRef()
@@ -20070,8 +20112,9 @@ b:SetHeight(22)
 b:SetPoint("BOTTOMLEFT",20,18)
 b:SetText("Clear")
 b:SetScript("OnClick",function()
-NxData.NXDataIssues={L={},S={}}
+NxData.NXDataIssues={L={},S={},Seen=0}
 Nx.DIRef()
+Nx.DIUpd()
 end)
 local b2=CreateFrame("Button",nil,f,"UIPanelButtonTemplate")
 b2:SetWidth(100)
@@ -20080,7 +20123,12 @@ b2:SetPoint("BOTTOMRIGHT",-20,18)
 b2:SetText("Close")
 b2:SetScript("OnClick",function() f:Hide() end)
 end
+local d=NxData and NxData.NXDataIssues
+if type(d)=="table" and type(d.L)=="table" then
+d.Seen=#d.L
+end
 Nx.DIRef()
+Nx.DIUpd()
 f:Show()
 end
 function Nx.NXMiniMapBut:M_ODI()
@@ -20097,7 +20145,7 @@ self.Men=men
 men:AdI1(0,"Help",self.M_OSH,self)
 men:AdI1(0,"Options",self.M_OO,self)
 men:AdI1(0,"Show Map",self.M_OSM,self)
-men:AdI1(0,"Show Data Issues",self.M_ODI,self)
+self.DIIte=men:AdI1(0,"Show Data Issues",self.M_ODI,self)
 if not Nx.Fre then
 men:AdI1(0,"Show Combat Graph",self.M_OSC,self)
 men:AdI1(0,"Show Events",self.M_OSE,self)
@@ -20129,6 +20177,7 @@ men:AdI1(0,"",nil,self)
 men:AdI1(0,"Toggle Profiling",self.M_OP,self)
 end
 NXMiniMapBut:SetClampedToScreen(true)
+Nx.DIUpd()
 local ok,var=pcall(GetCVar,"scriptProfile")
 if ok and var~="0" then
 Nx:ShM("Profiling is on. This decreases game performance. Disable?","Disable and Reload",self.ToP1,"Cancel")
