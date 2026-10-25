@@ -21234,6 +21234,7 @@ for n=1,num do
 local id,qi=QuestPOIGetQuestIDByVisibleIndex(n)
 if not self.ITQ[id] or self.ITQ[-id] then
 local _,x,y,obj1=QuestPOIGetIconInfo(id)
+if x and y then
 local tit=GetQuestLogTitle(qi)
 local que=self.ITQ[-id]
 if not que then
@@ -21250,6 +21251,7 @@ que[2]=format("%c%s%c %c%c%c%c",#s+35,s,zon+35,floor(x/221)+35,x % 221+35,floor(
 local lbC=GetNumQuestLeaderBoards(qi)
 for i=1,lbC do
 que[3+i]=que[2]
+end
 end
 end
 end
