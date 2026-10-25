@@ -18,6 +18,8 @@ Cataclysm portals (Horde) — Orgrimmar to Tol Barad Peninsula, Deepholm and Bla
 Caverns of Time map hover — the CoT layers are flagged as city maps (needed for the drawn map), which also made them win the map's mouse-over zone selection: inside the cave the map jumped between layers depending on mouse position, and on the Tanaris map hovering the cave switched to the CoT city view and darkened the continent. Hovering now never selects the CoT layers, and inside the cave the map always shows the layer you are in.
 Caverns of Time quest NPCs — Caverns of Time has two Andormu NPCs (adult and child), but Carbonite's quest database had the adult's position for every Andormu quest. All Andormu quests (The Caverns of Time, To The Master's Lair, Old Hillsbrad, The Black Morass, Return to Andormu, Hero of the Brood) now point to the child Andormu. Erozion and Sa'at stand inside instances that are closed on Grimfall and had no position at all; they now point to the Escape from Durnholde and Black Morass portals.
 Feedback: please use GitHub issues.
+Quest map point error — a Lua error ("attempt to perform arithmetic on local 'x'", Nx.Que:SBQDZ) when the game returned no map point for a quest during Carbonite's background quest scan (seen e.g. on joining a party in Tol Barad). Such quests are now skipped.
+Data Issues window — cases where Carbonite skips missing game data are recorded (once each, kept between sessions). Right click the Carbonite minimap button > Show Data Issues to see them (copyable text, Clear button). A red ! on the minimap button, the menu entry and the button's tooltip show when there are new entries.
 Installation
 
 Option A — download the whole repo:
