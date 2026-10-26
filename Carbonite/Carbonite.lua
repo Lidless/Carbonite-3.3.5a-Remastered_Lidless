@@ -9654,6 +9654,78 @@ by=by+1
 end
 end
 end
+function Nx.Map:MXT(maI,frm1,alp,lev)
+local win1=self.MWI[maI]
+local inf=win1 and win1.Con and self.MaI2[win1.Con]
+if not inf then
+return
+end
+local zx=inf.X+win1[2]
+local zy=inf.Y+win1[3]
+local zw=win1[1]*100
+local zh=zw/1.5
+local sca=self.ScD
+local clW=self.MaW
+local clH=self.MaH
+local x=(zx-self.MPXD)*sca+clW/2
+local y=(zy-self.MPYD)*sca+clH/2
+local bx=0
+local by=0
+local bw=zw*1024/1002/4*sca
+local bh=zh*768/668/3*sca
+local w,h
+local tX1,tX2
+local tY1,tY2
+for i=1,NUM_WORLDMAP_DETAIL_TILES do
+local frm=frm1[i]
+if frm then
+tX1=0
+tX2=1
+tY1=0
+tY2=1
+local vx0=bx*bw+x
+local vx1=vx0
+local vx2=vx0+bw
+if vx1<0 then
+vx1=0
+tX1=(vx1-vx0)/bw
+end
+if vx2>clW then
+vx2=clW
+tX2=(vx2-vx0)/bw
+end
+local vy0=by*bh+y
+local vy1=vy0
+local vy2=vy0+bh
+if vy1<0 then
+vy1=0
+tY1=(vy1-vy0)/bh
+end
+if vy2>clH then
+vy2=clH
+tY2=(vy2-vy0)/bh
+end
+w=vx2-vx1
+h=vy2-vy1
+if w<=0 or h<=0 then
+frm:Hide()
+else
+frm:SetPoint("TOPLEFT",vx1,-vy1-self.TiH)
+frm:SetWidth(w)
+frm:SetHeight(h)
+frm:SetFrameLevel(lev)
+frm.tex:SetTexCoord(tX1,tX2,tY1,tY2)
+frm.tex:SetVertexColor(1,1,1,alp)
+frm:Show()
+end
+end
+bx=bx+1
+if bx>=4 then
+bx=0
+by=by+1
+end
+end
+end
 function Nx.Sec:Unl()
 local Nx=Nx
 local function fun()
@@ -18643,6 +18715,19 @@ end
 end
 end
 end
+self.XZF={}
+for maI,fn in pairs({[2031]="TolBaradDailyArea",[2032]="TolBarad",[2034]="Gilneas"}) do
+local t1={}
+self.XZF[maI]=t1
+for i=1,NUM_WORLDMAP_DETAIL_TILES do
+local xf=CreateFrame("Frame",nil,f)
+t1[i]=xf
+local t=xf:CreateTexture()
+t:SetAllPoints(xf)
+xf.tex=t
+t:SetTexture("Interface\\WorldMap\\"..fn.."\\"..fn..i)
+end
+end
 local cf=CreateFrame("Frame",nil,f)
 self.CFF=cf
 local t=cf:CreateTexture()
@@ -26175,6 +26260,17 @@ for coN=1,Nx.Map.CoC do
 local lvl=coN~=4 and self.Lev or self.Lev+1
 self:MZT(coN,0,self.CoF[coN],self.WoA,lvl)
 end
+if self.XZF then
+for maI,t1 in pairs(self.XZF) do
+if maI~=self.MaI then
+self:MXT(maI,t1,self.WoA,self.Lev)
+else
+for i=1,NUM_WORLDMAP_DETAIL_TILES do
+t1[i]:Hide()
+end
+end
+end
+end
 local f=self.CFF
 if f then
 if Nx.V30 then
@@ -26199,6 +26295,13 @@ end
 end
 if self.CFF then
 self.CFF:Hide()
+end
+if self.XZF then
+for _,t1 in pairs(self.XZF) do
+for i=1,NUM_WORLDMAP_DETAIL_TILES do
+t1[i]:Hide()
+end
+end
 end
 end
 end
