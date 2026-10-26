@@ -7673,6 +7673,22 @@ end
 end
 end
 end
+for _,maI in ipairs({2033,2034}) do
+local w=self.MWI[maI]
+if w and w.Zon and w.Zon>=900 then
+local col,inS=self:GMND(maI)
+local spo={}
+tinsert(quC,spo)
+spo.MaI=maI
+local wx1,wy1=self:GWP(maI,0,0)
+local wx2,wy2=self:GWP(maI,100,100)
+spo.WX1=min(wx1,wx2)
+spo.WX2=max(wx1,wx2)
+spo.WY1=min(wy1,wy2)
+spo.WY2=max(wy1,wy2)
+spo.NTB=format("%s, %s%s (%s)",self:GWCI(2) or "",col,w.Nam,inS)
+end
+end
 end
 function Nx.War:Ini()
 self.Ena=not Nx.Fre and Nx:GGO()["WarehouseEnable"]
@@ -24047,7 +24063,11 @@ self.BaS=1
 if maI>1000 and maI<6000 then
 local con1=self.MWI[maI].Con
 local zon=self.MWI[maI].Zon
-if not con1 or not zon or zon>=900 or maI==self:GRBMI() or maI==self:GRMI() then
+if zon and zon>=900 then
+if maI==self:GRMI() then
+SetMapToCurrentZone()
+end
+elseif not con1 or not zon or maI==self:GRBMI() or maI==self:GRMI() then
 SetMapToCurrentZone()
 else
 SetMapZoom(con1,zon)
