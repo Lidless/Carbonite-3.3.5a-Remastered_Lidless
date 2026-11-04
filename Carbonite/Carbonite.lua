@@ -7910,6 +7910,7 @@ self.SZS=1
 flg=flg+8
 enS=strchar(#enS-1+35) .. strsub(enS,1,-2)
 end
+flg=flg+16
 self:SeP3(format("S%c%4x%3x%4x%c%c%c%s%s%s",flg+35,self.PMI,x,y,hpe+48,plL+35,self.PCI+35,tSt,qSt1,enS))
 end
 if not self.PSM then
@@ -18875,6 +18876,10 @@ local maN=iTN[maI] or "?"
 local tSt=pl.TSt or ""
 local qSt1=pl.QSt or ""
 f.NxT=format("%s\n  %s (%d,%d)%s%s",pl.Tip,maN,pl.X,pl.Y,tSt,qSt1)
+local frk=bit.band(pl.F or 0,16)>0
+if frk then
+f.NxT=f.NxT.."\n|cff60ff60Carbonite Grimfall|r"
+end
 local txN=icN
 if self.PaN[nam]==false then
 txN="IconPlyrF"
@@ -18883,6 +18888,11 @@ if bit.band(pl.F,1)>0 then
 txN=txN .. "C"
 end
 f.tex:SetTexture("Interface\\AddOns\\Carbonite\\Gfx\\Map\\"..txN)
+if frk then
+f.tex:SetVertexColor(.55,1,.55)
+else
+f.tex:SetVertexColor(1,1,1)
+end
 if alt then
 local s=pl.TTy==2 and sTT and(nam .. tSt) or nam
 local txt=map:GetText(s)
@@ -20559,6 +20569,12 @@ if inC1 then
 txN=txN.."C"
 end
 f1.tex:SetTexture("Interface\\AddOns\\Carbonite\\Gfx\\Map\\"..txN)
+local ci=Nx.Com.PaI[nam] or Nx.Com.ZPI[nam]
+if ci and bit.band(ci.F or 0,16)>0 then
+f1.tex:SetVertexColor(.55,1,.55)
+else
+f1.tex:SetVertexColor(1,1,1)
+end
 local tSt=""
 f=self:GINI(2)
 if per>.33 then
