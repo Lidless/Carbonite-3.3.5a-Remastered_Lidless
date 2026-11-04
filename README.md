@@ -21,6 +21,7 @@ Caverns of Time quest NPCs — Caverns of Time has two Andormu NPCs (adult and c
 Feedback: please use GitHub issues.
 Quest map point error — a Lua error ("attempt to perform arithmetic on local 'x'", Nx.Que:SBQDZ) when the game returned no map point for a quest during Carbonite's background quest scan (seen e.g. on joining a party in Tol Barad). Such quests are now skipped.
 Data Issues window — cases where Carbonite skips missing game data are recorded (once each, kept between sessions). Right click the Carbonite minimap button > Show Data Issues to see them (copyable text, Clear button). A red ! on the minimap button, the menu entry and the button's tooltip show when there are new entries.
+Spot other users of this fork — players who run this Grimfall fork (this version or newer) appear with a green-tinted icon on the Carbonite map, with a "Carbonite Grimfall" line in their tooltip. It uses a spare flag bit in Carbonite's position message that the original Carbonite ignores, so nothing changes for players on other versions.
 Installation
 
 Option A — download the whole repo:
