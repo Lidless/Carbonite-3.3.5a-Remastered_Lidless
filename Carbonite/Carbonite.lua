@@ -10776,9 +10776,7 @@ self:Upd()
 end
 self.BAT1=Nx.But:Cre(self.BuM2.Frm,"QuestWatchATrack",nil,nil,43,0,"CENTER",1,1,fun,self)
 local function fun(self,but1)
-Nx.ChO["QMapShowQuestGivers3"]=but1:GeS3()
-local map=Nx.Map:GeM(1)
-map.Gui:UGF()
+Nx.Map:SQGS(but1:GeS3())
 end
 self.BQG=Nx.But:Cre(self.BuM2.Frm,"QuestWatchGivers",nil,nil,57,0,"CENTER",1,1,fun,self)
 self.BQG:SeS3(Nx.ChO["QMapShowQuestGivers3"])
@@ -11793,6 +11791,31 @@ ite:SetChecked(Nx.ChO,"MapShowGatherH")
 local ite=shM:AdI1(0,"Show Mining Locations",fun,m)
 m.MISM=ite
 ite:SetChecked(Nx.ChO,"MapShowGatherM")
+local function fQG(self,ite)
+local v=Nx.ChO["QMapShowQuestGivers3"] or 1
+if ite==self.MIQG then
+v=ite:GetChecked() and(v==3 and 3 or 2) or 1
+else
+if ite:GetChecked() then
+v=3
+elseif v==3 then
+v=2
+end
+end
+Nx.Map:SQGS(v)
+end
+m.MIQG=shM:AdI1(0,"Show Quest Givers",fQG,m)
+m.MIQD=shM:AdI1(0,"Show Daily Quest Givers Only",fQG,m)
+local function fQL()
+Nx.Map:GeM(1).Gui:UGF()
+end
+local ite=shM:AdI1(0,"Quest Giver Lower Levels To Show",fQL,m)
+ite:SeS2(gop,0,80,1,"QMapQuestGiversLowLevel")
+local ite=shM:AdI1(0,"Quest Giver Higher Levels To Show",fQL,m)
+ite:SeS2(gop,0,80,1,"QMapQuestGiversHighLevel")
+local v=Nx.ChO["QMapShowQuestGivers3"] or 1
+m.MIQG:SetChecked(v>1)
+m.MIQD:SetChecked(v==3)
 local ite=shM:AdI1(0,"Show Notes")
 ite:SetChecked(gop,"MapShowNotes")
 local ite=shM:AdI1(0,"Show Punks")
@@ -25786,6 +25809,25 @@ end
 function Nx.Inf:CIF(vaN)
 if not self.Var[vaN] then
 return "",""
+end
+end
+function Nx.Map:SQGS(v,noU)
+Nx.ChO["QMapShowQuestGivers3"]=v
+local map=Nx.Map:GeM(1)
+if map then
+if map.MIQG then
+map.MIQG:SetChecked(v>1)
+end
+if map.MIQD then
+map.MIQD:SetChecked(v==3)
+end
+if not noU and map.Gui then
+map.Gui:UGF()
+end
+end
+local w=Nx.Que and Nx.Que.Wat
+if w and w.BQG then
+w.BQG:SeS3(v)
 end
 end
 function Nx.Map.Gui:CSF()
