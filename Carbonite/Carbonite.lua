@@ -6658,6 +6658,9 @@ local a=map.GOp["MapIconGatherA"]
 map:SITA("!Ga",a,a<1 and a*.5)
 map:SITC("!Ga",true)
 map:SITAS("!Ga",map.GOp["MapIconGatherAtScale"])
+map:IIT("!GQD","WP","",16,16)
+map:SITC("!GQD",true)
+map:SITL("!GQD",0)
 map:IIT("!GQ","WP","",16,16)
 map:SITC("!GQ",true)
 map:SITL("!GQ",1)
@@ -6780,7 +6783,7 @@ local que=Que.ITQ[qId]
 local stN1,zon,x,y=Que:GOP(que,que[2])
 local wx,wy=Map:GWP(maI,x,y)
 local tx=anD and "Interface\\AddOns\\Carbonite\\Gfx\\Map\\IconExclaimB" or "Interface\\AddOns\\Carbonite\\Gfx\\Map\\IconExclaimG"
-local ico=map:AIP(show and "!GQ" or "!GQC",wx,wy,nil,tx)
+local ico=map:AIP(show and(anD and "!GQD" or "!GQ") or "!GQC",wx,wy,nil,tx)
 map:SIT(ico,s)
 ico.UDQGD=qda
 end
@@ -18123,7 +18126,7 @@ local enN,zon,x,y=Que:GOP(q,obj)
 local maI=Map.NTMI[zon]
 if maI then
 local wx,wy=map:GWP(maI,x,y)
-local f=map:GIS(4)
+local f=map:GIS(5)
 if map:CFW(f,wx,wy,nav,nav,0) then
 f.NXType=9000
 f.NXData=cur
