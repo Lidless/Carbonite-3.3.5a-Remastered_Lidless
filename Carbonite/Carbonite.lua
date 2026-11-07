@@ -24667,6 +24667,168 @@ if win.Eve and win.Eve[eve] then
 win.Eve[eve](win.Use,eve,...)
 end
 end
+function Nx.Que:QICh(qId)
+local prv=self.QIPv
+if not prv then
+prv={}
+for id,q in pairs(self.ITQ) do
+local _,_,_,_,ne=self:Unp(q[1])
+if ne and ne>0 and not prv[ne] then
+prv[ne]=id
+end
+end
+self.QIPv=prv
+end
+local id=qId
+local gua=0
+while prv[id] and gua<50 do
+id=prv[id]
+gua=gua+1
+end
+local ch={}
+gua=0
+while id and id>0 and self.ITQ[id] and gua<50 do
+tinsert(ch,id)
+local _,_,_,_,ne=self:Unp(self.ITQ[id][1])
+id=ne
+gua=gua+1
+end
+return ch
+end
+function Nx.Que:QINP(que,str)
+if type(str)~="string" or #str<2 then
+return
+end
+local ok,nam,zon,x,y=pcall(self.GOP,self,que,str)
+if not ok or not nam then
+return
+end
+nam=strsplit("!",nam)
+local zna=zon and Nx.Zon1[zon] and strsplit("!",Nx.Zon1[zon]) or "?"
+if x and y then
+return format("%s, %s (%.0f, %.0f)",nam,zna,x,y)
+end
+return format("%s, %s",nam,zna)
+end
+function Nx.Que:QISt(id)
+if Nx:GeQ(id)=="C" then
+return "C"
+elseif self.QId1 and self.QId1[id] then
+return "L"
+end
+return "T"
+end
+function Nx.Que:QIW(qId)
+local que=self.ITQ[qId]
+if not que then
+return
+end
+local f=self.QIF
+if not f then
+f=CreateFrame("Frame","NxQuestInfoFrame",UIParent)
+self.QIF=f
+f:SetWidth(460)
+f:SetHeight(360)
+f:SetPoint("CENTER")
+f:SetFrameStrata("DIALOG")
+f:SetToplevel(true)
+f:SetMovable(true)
+f:EnableMouse(true)
+f:SetClampedToScreen(true)
+f:RegisterForDrag("LeftButton")
+f:SetScript("OnDragStart",function(s) s:StartMoving() end)
+f:SetScript("OnDragStop",function(s) s:StopMovingOrSizing() end)
+f:SetBackdrop({bgFile="Interface\\DialogFrame\\UI-DialogBox-Background",edgeFile="Interface\\DialogFrame\\UI-DialogBox-Border",tile=true,tileSize=32,edgeSize=32,insets={left=11,right=12,top=12,bottom=11}})
+tinsert(UISpecialFrames,"NxQuestInfoFrame")
+local t=f:CreateFontString(nil,"ARTWORK","GameFontNormal")
+t:SetPoint("TOP",0,-18)
+t:SetWidth(400)
+f.Tit=t
+local b=f:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall")
+b:SetPoint("TOPLEFT",22,-42)
+b:SetPoint("BOTTOMRIGHT",-22,50)
+b:SetJustifyH("LEFT")
+b:SetJustifyV("TOP")
+f.Bod=b
+local c=CreateFrame("Button",nil,f,"UIPanelCloseButton")
+c:SetPoint("TOPRIGHT",-6,-6)
+local g=CreateFrame("Button",nil,f,"UIPanelButtonTemplate")
+g:SetWidth(200)
+g:SetHeight(22)
+g:SetPoint("BOTTOMLEFT",20,18)
+g:SetScript("OnClick",function(s)
+if s.QId then
+Nx.Que:Got(s.QId)
+end
+end)
+f.GoB=g
+local cl=CreateFrame("Button",nil,f,"UIPanelButtonTemplate")
+cl:SetWidth(100)
+cl:SetHeight(22)
+cl:SetPoint("BOTTOMRIGHT",-20,18)
+cl:SetText("Close")
+cl:SetScript("OnClick",function() f:Hide() end)
+end
+local nam,_,lvl,min5=self:Unp(que[1])
+f.Tit:SetText(format("%s  |cffbfbfbf(level %d)|r",nam,lvl))
+local l={}
+local dai=(self.DaI and self.DaI[qId]) or(self.DDI and self.DDI[qId])
+tinsert(l,format("Level %d%s%s",lvl,(min5 and min5>0) and format(", requires level %d",min5) or "",dai and ", |cff4cacffdaily|r" or ""))
+local st=self:QINP(que,que[2])
+if st then
+tinsert(l,"Starts at: "..st)
+end
+local en=self:QINP(que,que[3] or que[2])
+if en then
+tinsert(l,"Ends at: "..en)
+end
+tinsert(l,"")
+local ch=self:QICh(qId)
+local mis
+if #ch>1 then
+tinsert(l,format("Quest chain (%d steps):",#ch))
+local bef=true
+for i,id in ipairs(ch) do
+local q=self.ITQ[id]
+local qn,_,ql=self:Unp(q[1])
+local s=self:QISt(id)
+local mrk,col,suf="[ ]","|cffffffff",""
+if s=="C" then
+mrk,col,suf="[x]","|cff808080"," (done)"
+elseif s=="L" then
+mrk,col,suf="[>]","|cff80ff80"," (in your log)"
+elseif bef and id~=qId and not mis then
+mis=id
+col,suf="|cffff5050"," <- missing step"
+end
+if id==qId then
+suf=suf.."  |cffffd200<- this quest|r"
+bef=false
+end
+tinsert(l,format("%s %s%d. %s|r |cffbfbfbf(%d)|r%s",mrk,col,i,qn,ql,suf))
+end
+else
+tinsert(l,"No quest chain known for this quest.")
+end
+f.Bod:SetText(table.concat(l,"\n"))
+local g=f.GoB
+if mis then
+local mn=self:Unp(self.ITQ[mis][1])
+g.QId=mis
+g:SetText("Goto missing step")
+g.tooltipText=mn
+g:Enable()
+else
+g.QId=self:QISt(qId)=="T" and qId or nil
+g:SetText(g.QId and "Goto quest giver" or "Goto")
+if g.QId then
+g:Enable()
+else
+g:Disable()
+end
+end
+f:Show()
+end
 function Nx.Que:CGIM(maM,frm)
 local coM1=Nx.Men:Cre(frm)
 self.GIMC=coM1
@@ -24694,8 +24856,7 @@ self.GIMIIT={}
 for n=1,29 do
 local function fun(self,ite)
 if not IsShiftKeyDown() then
-local lin=self:CrL(ite.UDa,-1,"x")
-SetItemRef(lin)
+self:QIW(ite.UDa)
 else
 self:Got(ite.UDa)
 end
