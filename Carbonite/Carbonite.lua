@@ -17728,6 +17728,23 @@ self.Clo1=nil
 self.ClT=60*1
 self.Alp=0
 self.AlT=1
+local w=self.Wid0 or self.Wid
+self.Wid0=w
+local ms=Nx.Men.MFS
+if not ms then
+ms=UIParent:CreateFontString(nil,"OVERLAY")
+ms:SetFontObject("NxFontMenu")
+ms:Hide()
+Nx.Men.MFS=ms
+end
+for n=1,#self.Ite1 do
+local ite=self.Ite1[n]
+if ite.ShS and ite.Tex then
+ms:SetText(ite.Tex)
+w=max(w,ms:GetStringWidth()+20+28+8)
+end
+end
+self.Wid=w
 local meW=self.Wid
 local meH=self:Upd()+14
 mf:SetFrameStrata("DIALOG")
@@ -19055,6 +19072,7 @@ t:SetTexture(1,1,1,1)
 t:SetAllPoints(itF)
 itF.tex=t
 end
+itF:SetWidth(meW-meX*2)
 if ite.Tex then
 local fst=ite.TFS1
 if not fst then
@@ -19066,6 +19084,7 @@ fst:SetWidth(meW-20)
 fst:SetHeight(12)
 fst:SetJustifyH("LEFT")
 end
+fst:SetWidth(meW-meX*2-20)
 if ite.ShS<0 then
 fst:SetText("|cff707070" .. ite.Tex)
 else
