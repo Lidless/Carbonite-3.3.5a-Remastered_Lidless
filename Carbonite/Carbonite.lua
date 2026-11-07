@@ -6790,6 +6790,7 @@ end
 end
 end
 end
+Nx.LGD(map,fol)
 elseif mod1==40 then
 local maI,x,y=strsplit("^",fol.VeP1)
 maI=tonumber(maI)
@@ -26526,4 +26527,167 @@ local maI,x,y=self:GPP()
 Nx:AIE(nam,Nx:Tim1(),maI,x,y)
 self:UpA()
 return maI
+end
+function Nx.LGK()
+if Nx.LGKn then
+return Nx.LGKn
+end
+local k={}
+local Que=Nx.Que
+if Que and Que.ITQ then
+for id,que in pairs(Que.ITQ) do
+if que[1] then
+local ok,nam=pcall(Que.Unp,Que,que[1])
+if ok and nam then
+k[nam]=true
+end
+end
+end
+end
+Nx.LGKn=k
+return k
+end
+function Nx.LGLog()
+local t={}
+for i=1,GetNumQuestLogEntries() do
+local tit,_,_,_,hea=GetQuestLogTitle(i)
+if tit and not hea then
+t[tit]=true
+end
+end
+return t
+end
+function Nx.LGL(lst)
+if not NxData or not UnitExists("npc") or UnitIsPlayer("npc") then
+return
+end
+local map=Nx.Map:GeM(1)
+if not map or not map.RMI or not map.PRZX or not Nx.Map.MWI[map.RMI] then
+return
+end
+local npc=UnitName("npc")
+if not npc then
+return
+end
+local kno=Nx.LGK()
+local add
+for _,q in ipairs(lst) do
+if q.T and not kno[q.T] then
+add=add or {}
+tinsert(add,q)
+end
+end
+if not add then
+return
+end
+local d=NxData.NXLGiv
+if type(d)~="table" then
+d={}
+NxData.NXLGiv=d
+end
+local z=d[map.RMI]
+if not z then
+z={}
+d[map.RMI]=z
+end
+local g=z[npc]
+if not g then
+g={Q={}}
+z[npc]=g
+end
+g.X=map.PRZX
+g.Y=map.PRZY
+for _,q in ipairs(add) do
+local o=g.Q[q.T]
+g.Q[q.T]={L=(q.L and q.L>0) and q.L or(o and o.L) or 0,D=q.D or(o and o.D)}
+end
+if map.Gui then
+map.Gui:UGF()
+end
+end
+function Nx.LGE(eve)
+if eve=="GOSSIP_SHOW" then
+local t={GetGossipAvailableQuests()}
+local ste=(type(t[4])=="string") and 3 or 5
+local lst={}
+for i=1,#t,ste do
+if type(t[i])=="string" then
+tinsert(lst,{T=t[i],L=tonumber(t[i+1]),D=ste==5 and t[i+3] and true or nil})
+end
+end
+Nx.LGL(lst)
+elseif eve=="QUEST_GREETING" then
+local lst={}
+for i=1,GetNumAvailableQuests() do
+local dai
+if GetAvailableQuestInfo then
+local _,d=GetAvailableQuestInfo(i)
+dai=d and true or nil
+end
+tinsert(lst,{T=GetAvailableTitle(i),L=GetAvailableLevel(i),D=dai})
+end
+Nx.LGL(lst)
+elseif eve=="QUEST_DETAIL" then
+Nx.LGL({{T=GetTitleText()}})
+elseif eve=="QUEST_COMPLETE" then
+local tit=GetTitleText()
+if tit and NxCData then
+NxCData.NXLGDone=NxCData.NXLGDone or {}
+NxCData.NXLGDone[tit]=true
+end
+end
+end
+function Nx.LGD(map,fol)
+local d=NxData and NxData.NXLGiv
+if type(d)~="table" then
+return
+end
+local maI=map:GCMI()
+local z=d[maI]
+if not z then
+return
+end
+local opt=Nx:GGO()
+local lvP=Nx.CuC["Level"]
+local miL=lvP-opt["QMapQuestGiversLowLevel"]
+local maL1=lvP+min(opt["QMapQuestGiversHighLevel"],10)
+local don=NxCData and NxCData.NXLGDone or {}
+local inL=Nx.LGLog()
+local sta1=Nx.ChO[fol.Per]
+for npc,g in pairs(z) do
+local s=npc
+local show
+local onD=true
+for tit,q in pairs(g.Q) do
+if not don[tit] and not inL[tit] and(sta1~=3 or q.D) then
+local lvl=(q.L and q.L>0) and q.L or lvP
+if lvl>=miL and lvl<=maL1 then
+show=true
+if not q.D then
+onD=false
+end
+s=format("%s\n|cffbfbfbf%d|r %s%s",s,lvl,tit,q.D and " (Daily)" or "")
+end
+end
+end
+if show and g.X then
+local wx,wy=Nx.Map:GWP(maI,g.X,g.Y)
+local tx=onD and "Interface\\AddOns\\Carbonite\\Gfx\\Map\\IconExclaimB" or "Interface\\AddOns\\Carbonite\\Gfx\\Map\\IconExclaimG"
+local ico=map:AIP(onD and "!GQD" or "!GQ",wx,wy,nil,tx)
+map:SIT(ico,s.."\n|cff808080(learned)|r")
+end
+end
+end
+do
+local f=CreateFrame("Frame")
+f:RegisterEvent("GOSSIP_SHOW")
+f:RegisterEvent("QUEST_GREETING")
+f:RegisterEvent("QUEST_DETAIL")
+f:RegisterEvent("QUEST_COMPLETE")
+f:SetScript("OnEvent",function(self,eve)
+local ok,err=pcall(Nx.LGE,eve)
+if not ok and Nx.DLog then
+Nx.DLog("Learned givers",tostring(err),tostring(err))
+end
+end)
 end
