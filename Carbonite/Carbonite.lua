@@ -26539,7 +26539,16 @@ for id,que in pairs(Que.ITQ) do
 if que[1] then
 local ok,nam=pcall(Que.Unp,Que,que[1])
 if ok and nam then
-k[nam]=true
+local g=k[nam]
+if not g then
+g={}
+k[nam]=g
+end
+local st=que[2]
+if type(st)=="string" and #st>1 then
+local n=strbyte(st,1)-35
+g[strsub(st,2,n+1)]=true
+end
 end
 end
 end
@@ -26557,22 +26566,40 @@ end
 end
 return t
 end
+function Nx.LGNpc()
+if UnitExists("npc") then
+if UnitIsPlayer("npc") then
+return
+end
+return UnitName("npc")
+end
+for _,f in ipairs({"GossipFrameNpcNameText","QuestFrameNpcNameText"}) do
+local fs=_G[f]
+local p=fs and fs:GetParent()
+if fs and fs:IsVisible() and fs:GetText() then
+return fs:GetText()
+end
+end
+if UnitExists("target") and not UnitIsPlayer("target") then
+return UnitName("target")
+end
+end
 function Nx.LGL(lst)
-if not NxData or not UnitExists("npc") or UnitIsPlayer("npc") then
+if not NxData then
 return
 end
 local map=Nx.Map:GeM(1)
 if not map or not map.RMI or not map.PRZX or not Nx.Map.MWI[map.RMI] then
 return
 end
-local npc=UnitName("npc")
+local npc=Nx.LGNpc()
 if not npc then
 return
 end
 local kno=Nx.LGK()
 local add
 for _,q in ipairs(lst) do
-if q.T and not kno[q.T] then
+if q.T and not(kno[q.T] and kno[q.T][npc]) then
 add=add or {}
 tinsert(add,q)
 end
