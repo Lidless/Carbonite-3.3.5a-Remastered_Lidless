@@ -26626,7 +26626,8 @@ g.X=map.PRZX
 g.Y=map.PRZY
 for _,q in ipairs(add) do
 local o=g.Q[q.T]
-g.Q[q.T]={L=(q.L and q.L>0) and q.L or(o and o.L) or 0,D=q.D or(o and o.D)}
+local pl=UnitLevel("player")
+g.Q[q.T]={L=(q.L and q.L>0) and q.L or(o and o.L) or 0,D=q.D or(o and o.D),R=q.R or(o and o.R),ML=min(pl,o and o.ML or pl)}
 end
 if map.Gui then
 map.Gui:UGF()
@@ -26639,26 +26640,35 @@ local ste=(type(t[4])=="string") and 3 or 5
 local lst={}
 for i=1,#t,ste do
 if type(t[i])=="string" then
-tinsert(lst,{T=t[i],L=tonumber(t[i+1]),D=ste==5 and t[i+3] and true or nil})
+tinsert(lst,{T=t[i],L=tonumber(t[i+1]),D=ste==5 and t[i+3] and true or nil,R=ste==5 and t[i+4] and true or nil})
 end
 end
 Nx.LGL(lst)
 elseif eve=="QUEST_GREETING" then
 local lst={}
 for i=1,GetNumAvailableQuests() do
-local dai
+local dai,rep
 if GetAvailableQuestInfo then
-local _,d=GetAvailableQuestInfo(i)
+local _,d,r=GetAvailableQuestInfo(i)
 dai=d and true or nil
+rep=r and true or nil
 end
-tinsert(lst,{T=GetAvailableTitle(i),L=GetAvailableLevel(i),D=dai})
+tinsert(lst,{T=GetAvailableTitle(i),L=GetAvailableLevel(i),D=dai,R=rep})
 end
 Nx.LGL(lst)
 elseif eve=="QUEST_DETAIL" then
 Nx.LGL({{T=GetTitleText()}})
 elseif eve=="QUEST_COMPLETE" then
 local tit=GetTitleText()
-if tit and NxCData then
+local rep
+for _,z in pairs(NxData and NxData.NXLGiv or {}) do
+for _,g in pairs(z) do
+if g.Q[tit] and g.Q[tit].R then
+rep=true
+end
+end
+end
+if tit and NxCData and not rep then
 NxCData.NXLGDone=NxCData.NXLGDone or {}
 NxCData.NXLGDone[tit]=true
 end
@@ -26688,7 +26698,8 @@ local onD=true
 for tit,q in pairs(g.Q) do
 if not don[tit] and not inL[tit] and(sta1~=3 or q.D) then
 local lvl=(q.L and q.L>0) and q.L or lvP
-if lvl>=miL and lvl<=maL1 then
+local mlv=q.ML and min(q.ML,lvl) or lvl
+if lvl>=miL and mlv<=maL1 then
 show=true
 if not q.D then
 onD=false
