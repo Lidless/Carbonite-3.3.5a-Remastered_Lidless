@@ -24718,6 +24718,24 @@ return "L"
 end
 return "T"
 end
+function Nx.Que:QIGo(qId)
+local que=self.ITQ[qId]
+if not que or type(que[2])~="string" then
+Nx.prt("No quest starter")
+return
+end
+local ok,nam,zon,x,y=pcall(self.GOP,self,que,que[2])
+local maI=ok and zon and Nx.Map.NTMI[zon]
+if not maI or not x then
+Nx.prt("No quest starter location")
+return
+end
+local qna=self:Unp(que[1])
+local map=Nx.Map:GeM(1)
+Nx.Que.Wat:CAT()
+local wx,wy=map:GWP(maI,x,y)
+map:SeT3("Goto",wx,wy,wx,wy,nil,nil,"Goto: "..qna,false,maI)
+end
 function Nx.Que:QIW(qId)
 local que=self.ITQ[qId]
 if not que then
@@ -24758,7 +24776,7 @@ g:SetHeight(22)
 g:SetPoint("BOTTOMLEFT",20,18)
 g:SetScript("OnClick",function(s)
 if s.QId then
-Nx.Que:Got(s.QId)
+Nx.Que:QIGo(s.QId)
 end
 end)
 f.GoB=g
@@ -24858,7 +24876,7 @@ local function fun(self,ite)
 if not IsShiftKeyDown() then
 self:QIW(ite.UDa)
 else
-self:Got(ite.UDa)
+self:QIGo(ite.UDa)
 end
 end
 self.GIMIIT[n]=inM:AdI1(0,"?",fun,self)
