@@ -18185,20 +18185,6 @@ if shE or bit.band(mas,0x10000)>0 then
 local obj=que[3] or que[2]
 local enN,zon,x,y=Que:GOP(que,obj)
 local maI=Map.NTMI[zon]
-if maI and(not cur or not cur.CoM) then
-local wx,wy=map:GWP(maI,x,y)
-local f=map:GIS(4)
-if map:CFW(f,wx,wy,nav,nav,0) then
-f.NXType=9000
-f.NXData=cur
-f.NxT=format("%s\nEnd: %s (%.1f %.1f)",qna,enN,x,y)
-if cur and cur.PaN1 then
-f.NxT=f.NxT .. "\n" .. cur.PaN1
-end
-f.tex:SetVertexColor(.5,.5,.5,1)
-f.tex:SetTexture("Interface\\AddOns\\Carbonite\\Gfx\\Map\\IconQuestion")
-end
-end
 end
 if not cur or cur.QI>0 or cur.Par then
 local drA
