@@ -24648,7 +24648,7 @@ meI.UDa=qId
 meI:SetChecked(sta=="C")
 local meI=self.GIMIIT[cuI1]
 meI:Show()
-meI:SetText(s.."  |cff80c0ff[More info]|r")
+meI:SetText(s)
 meI.UDa=qId
 cuI1=cuI1+1
 end
@@ -24869,7 +24869,7 @@ self.GIMICT[n]:SetChecked()
 end
 local inM=Nx.Men:Cre(frm)
 self.GIMI=inM
-self.GIMII=maM:ASM(inM,"Quest Info...")
+self.GIMII=maM:ASM(inM,"Quest Info (click a quest)...")
 self.GIMIIT={}
 for n=1,29 do
 local function fun(self,ite)
