@@ -24648,7 +24648,7 @@ meI.UDa=qId
 meI:SetChecked(sta=="C")
 local meI=self.GIMIIT[cuI1]
 meI:Show()
-meI:SetText(s)
+meI:SetText(s.."  |cff80c0ff[More info]|r")
 meI.UDa=qId
 cuI1=cuI1+1
 end
@@ -24869,15 +24869,11 @@ self.GIMICT[n]:SetChecked()
 end
 local inM=Nx.Men:Cre(frm)
 self.GIMI=inM
-self.GIMII=maM:ASM(inM,"Quest Info (shift click - goto)...")
+self.GIMII=maM:ASM(inM,"Quest Info...")
 self.GIMIIT={}
 for n=1,29 do
 local function fun(self,ite)
-if not IsShiftKeyDown() then
 self:QIW(ite.UDa)
-else
-self:QIGo(ite.UDa)
-end
 end
 self.GIMIIT[n]=inM:AdI1(0,"?",fun,self)
 end
