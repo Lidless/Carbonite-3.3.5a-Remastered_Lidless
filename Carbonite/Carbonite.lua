@@ -6712,7 +6712,7 @@ local stz=Que.QGi[zon]
 if stz then
 local opt=Nx:GGO()
 local miL=Nx.CuC["Level"]-opt["QMapQuestGiversLowLevel"]
-local maL1=Nx.CuC["Level"]+opt["QMapQuestGiversHighLevel"]
+local maL1=Nx.CuC["Level"]+min(opt["QMapQuestGiversHighLevel"],10)
 local sta1=Nx.ChO[fol.Per]
 local deM=NxData.DebugMap
 local shC=self.SQGC
@@ -10832,7 +10832,7 @@ end
 local ite=men:AdI1(0,"Quests My level minus",fun,self)
 ite:SeS2(opt,0,80,1,"QMapQuestGiversLowLevel")
 local ite=men:AdI1(0,"Quests My level plus",fun,self)
-ite:SeS2(opt,0,80,1,"QMapQuestGiversHighLevel")
+ite:SeS2(opt,0,10,1,"QMapQuestGiversHighLevel")
 local men=Nx.Men:Cre(lis.Frm)
 self.WaM=men
 men:AdI1(0,"Remove Watch",self.M_ORW,self)
@@ -11812,7 +11812,7 @@ end
 local ite=shM:AdI1(0,"Quests My level minus",fQL,m)
 ite:SeS2(gop,0,80,1,"QMapQuestGiversLowLevel")
 local ite=shM:AdI1(0,"Quests My level plus",fQL,m)
-ite:SeS2(gop,0,80,1,"QMapQuestGiversHighLevel")
+ite:SeS2(gop,0,10,1,"QMapQuestGiversHighLevel")
 local v=Nx.ChO["QMapShowQuestGivers3"] or 1
 m.MIQG:SetChecked(v>1)
 m.MIQD:SetChecked(v==3)
