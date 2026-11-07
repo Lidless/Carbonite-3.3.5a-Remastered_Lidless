@@ -18126,7 +18126,8 @@ local enN,zon,x,y=Que:GOP(q,obj)
 local maI=Map.NTMI[zon]
 if maI then
 local wx,wy=map:GWP(maI,x,y)
-local f=map:GIS(5)
+local dai=Que.DaI[cur.QId] or Que.DDI[cur.QId]
+local f=map:GIS(dai and 5 or 6)
 if map:CFW(f,wx,wy,nav,nav,0) then
 f.NXType=9000
 f.NXData=cur
@@ -18135,7 +18136,7 @@ f.NxT=format("%s\nEnd: %s (%.1f %.1f)",qna,enN,x,y)
 if cur.PaN1 then
 f.NxT=f.NxT .. "\n" .. cur.PaN1
 end
-f.tex:SetTexture("Interface\\AddOns\\Carbonite\\Gfx\\Map\\IconQuestion")
+f.tex:SetTexture("Interface\\AddOns\\Carbonite\\Gfx\\Map\\"..(dai and "IconQuestionB" or "IconQuestion"))
 end
 end
 end
@@ -18194,7 +18195,7 @@ f.NxT=format("%s\nEnd: %s (%.1f %.1f)",qna,enN,x,y)
 if cur and cur.PaN1 then
 f.NxT=f.NxT .. "\n" .. cur.PaN1
 end
-f.tex:SetVertexColor(.6,1,.6,1)
+f.tex:SetVertexColor(.5,.5,.5,1)
 f.tex:SetTexture("Interface\\AddOns\\Carbonite\\Gfx\\Map\\IconQuestion")
 end
 end
