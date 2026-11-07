@@ -24737,13 +24737,14 @@ return "L"
 end
 return "T"
 end
-function Nx.Que:QIGo(qId)
+function Nx.Que:QIGo(qId,enD)
 local que=self.ITQ[qId]
-if not que or type(que[2])~="string" then
-Nx.prt("No quest starter")
+local str=que and(enD and(que[3] or que[2]) or que[2])
+if type(str)~="string" then
+Nx.prt(enD and "No quest end" or "No quest starter")
 return
 end
-local ok,nam,zon,x,y=pcall(self.GOP,self,que,que[2])
+local ok,nam,zon,x,y=pcall(self.GOP,self,que,str)
 local maI=ok and zon and Nx.Map.NTMI[zon]
 if not maI or not x then
 Nx.prt("No quest starter location")
@@ -24795,7 +24796,7 @@ g:SetHeight(22)
 g:SetPoint("BOTTOMLEFT",20,18)
 g:SetScript("OnClick",function(s)
 if s.QId then
-Nx.Que:QIGo(s.QId)
+Nx.Que:QIGo(s.QId,s.EnD)
 end
 end)
 f.GoB=g
@@ -24852,12 +24853,15 @@ local g=f.GoB
 if mis then
 local mn=self:Unp(self.ITQ[mis][1])
 g.QId=mis
+g.EnD=nil
 g:SetText("Goto missing step")
 g.tooltipText=mn
 g:Enable()
 else
-g.QId=self:QISt(qId)=="T" and qId or nil
-g:SetText(g.QId and "Goto quest giver" or "Goto")
+local qs=self:QISt(qId)
+g.QId=qs~="C" and qId or nil
+g.EnD=qs=="L"
+g:SetText(qs=="L" and "Goto quest end" or(g.QId and "Goto quest giver" or "Goto"))
 if g.QId then
 g:Enable()
 else
