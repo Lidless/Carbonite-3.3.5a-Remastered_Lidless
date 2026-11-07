@@ -6779,7 +6779,7 @@ local qId=tonumber(strsub(qda,1,4),16)
 local que=Que.ITQ[qId]
 local stN1,zon,x,y=Que:GOP(que,que[2])
 local wx,wy=Map:GWP(maI,x,y)
-local tx=anD and "Interface\\AddOns\\Carbonite\\Gfx\\Map\\IconExclaimB" or tx
+local tx=anD and "Interface\\AddOns\\Carbonite\\Gfx\\Map\\IconExclaimB" or "Interface\\AddOns\\Carbonite\\Gfx\\Map\\IconExclaimG"
 local ico=map:AIP(show and "!GQ" or "!GQC",wx,wy,nil,tx)
 map:SIT(ico,s)
 ico.UDQGD=qda
@@ -11809,9 +11809,9 @@ m.MIQD=shM:AdI1(0,"Show Daily Quest Givers Only",fQG,m)
 local function fQL()
 Nx.Map:GeM(1).Gui:UGF()
 end
-local ite=shM:AdI1(0,"Quest Giver Lower Levels To Show",fQL,m)
+local ite=shM:AdI1(0,"Giver Levels Below",fQL,m)
 ite:SeS2(gop,0,80,1,"QMapQuestGiversLowLevel")
-local ite=shM:AdI1(0,"Quest Giver Higher Levels To Show",fQL,m)
+local ite=shM:AdI1(0,"Giver Levels Above",fQL,m)
 ite:SeS2(gop,0,80,1,"QMapQuestGiversHighLevel")
 local v=Nx.ChO["QMapShowQuestGivers3"] or 1
 m.MIQG:SetChecked(v>1)
@@ -18404,7 +18404,11 @@ local per=(ite.SlP-ite.SlM1)/(ite.SlM2-ite.SlM1)
 tfr:SetPoint("TOPLEFT",per*100,0)
 if ite.Tex then
 local fst=ite.TFS1
+if ite.Ste and ite.Ste>=1 then
+fst:SetText(format("%s (%d)",ite.Tex,ite.SlP))
+else
 fst:SetText(format("%s (%.2f)",ite.Tex,ite.SlP))
+end
 end
 end
 function Nx.Inf:CMP()
