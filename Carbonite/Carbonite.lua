@@ -6751,10 +6751,9 @@ col2="|cffa0a0ff"
 show=true
 elseif sta=="C" then
 col2="|cff808080"
-else
-if qId1[qId] then
+elseif qId1[qId] then
 col2="|cff80f080"
-end
+else
 show=true
 end
 s=format("%s\n|cffbfbfbf%d%s %s",s,lvl,col2,qna)
