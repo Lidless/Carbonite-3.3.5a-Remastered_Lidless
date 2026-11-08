@@ -27071,3 +27071,31 @@ end
 end
 return t
 end
+do
+local oRQL=Nx.Que.RQL
+local function aft(...)
+local ok,err=pcall(function()
+local Que=Nx.Que
+local t={}
+for _,cur in ipairs(Que.CuQ or {}) do
+tinsert(t,tostring(cur.QId or cur.Tit)..(cur.CoM and "c" or ""))
+end
+sort(t)
+local sig=table.concat(t,",")
+if sig~=Nx.QGSig then
+Nx.QGSig=sig
+local map=Nx.Map:GeM(1)
+if map and map.Gui then
+map.Gui:UGF()
+end
+end
+end)
+if not ok and Nx.DLog then
+Nx.DLog("Quest giver refresh",tostring(err),tostring(err))
+end
+return ...
+end
+function Nx.Que:RQL(...)
+return aft(oRQL(self,...))
+end
+end
