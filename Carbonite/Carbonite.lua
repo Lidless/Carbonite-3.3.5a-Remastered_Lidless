@@ -6728,9 +6728,10 @@ local sta1=Nx.ChO[fol.Per]
 local deM=NxData.DebugMap
 local shC=self.SQGC
 local qId1=Que.QId1
+local enS=Nx.QGEnd()
 for nam2,qda in pairs(stz) do
 local nam=strsplit("=",nam2)
-if not Nx.QGHidden(nam) then
+if not Nx.QGHidden(nam) and not enS[nam] then
 local anD
 local show
 local s=nam
@@ -26909,11 +26910,12 @@ local maL1=lvP+min(opt["QMapQuestGiversHighLevel"],10)
 local don=NxCData and NxCData.NXLGDone or {}
 local inL=Nx.LGLog()
 local sta1=Nx.ChO[fol.Per]
+local enS=Nx.QGEnd()
 for npc,g in pairs(z) do
 local s=npc
 local show
 local onD=true
-if NxData.NXQGHid and NxData.NXQGHid[npc] then
+if NxData.NXQGHid and NxData.NXQGHid[npc] or enS[npc] then
 g=nil
 end
 if g then
@@ -27052,4 +27054,20 @@ if not ok and Nx.DLog then
 Nx.DLog("Quest giver check",tostring(err),tostring(err))
 end
 end)
+end
+function Nx.QGEnd()
+local t={}
+local Que=Nx.Que
+if Que and Que.CuQ then
+for _,cur in ipairs(Que.CuQ) do
+local q=cur.Q
+if q and cur.CoM then
+local o=q[3] or q[2]
+if type(o)=="string" and #o>1 then
+t[strsub(o,2,strbyte(o,1)-34)]=true
+end
+end
+end
+end
+return t
 end
