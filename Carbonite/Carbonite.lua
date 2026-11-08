@@ -26984,14 +26984,15 @@ end
 Nx.QGNm=t
 return t
 end
-function Nx.QGTgt()
-if not NxData or not UnitExists("target") or UnitIsPlayer("target") then
+function Nx.QGTgt(u)
+u=u or "target"
+if not NxData or not UnitExists(u) or UnitIsPlayer(u) then
 return
 end
-if not UnitCanAttack("player","target") or(UnitReaction("target","player") or 5)>3 then
+if not UnitCanAttack("player",u) or(UnitReaction(u,"player") or 5)>3 then
 return
 end
-local nam=UnitName("target")
+local nam=UnitName(u)
 local t=Nx.QGNames()
 if not nam or not t or not t[nam] then
 return
@@ -27045,8 +27046,9 @@ end
 do
 local f=CreateFrame("Frame")
 f:RegisterEvent("PLAYER_TARGET_CHANGED")
-f:SetScript("OnEvent",function()
-local ok,err=pcall(Nx.QGTgt)
+f:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
+f:SetScript("OnEvent",function(self,eve)
+local ok,err=pcall(Nx.QGTgt,eve=="UPDATE_MOUSEOVER_UNIT" and "mouseover" or "target")
 if not ok and Nx.DLog then
 Nx.DLog("Quest giver check",tostring(err),tostring(err))
 end
