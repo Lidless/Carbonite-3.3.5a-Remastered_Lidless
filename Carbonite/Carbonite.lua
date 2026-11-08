@@ -18149,7 +18149,7 @@ Que:TOM(cur.QId,tid % 100,cur.QI>0 or cur.Par,true,true)
 end
 end
 for k,cur in ipairs(Que.CuQ) do
-if cur.Q and cur.CoM then
+if cur.Q and(cur.CoM or cur.LBC==0) then
 local q=cur.Q
 local obj=q[3] or q[2]
 local enN,zon,x,y=Que:GOP(q,obj)
@@ -27061,7 +27061,7 @@ local Que=Nx.Que
 if Que and Que.CuQ then
 for _,cur in ipairs(Que.CuQ) do
 local q=cur.Q
-if q and cur.CoM then
+if q and(cur.CoM or cur.LBC==0) then
 local o=q[3] or q[2]
 if type(o)=="string" and #o>1 then
 t[strsub(o,2,strbyte(o,1)-34)]=true
@@ -27078,7 +27078,7 @@ local ok,err=pcall(function()
 local Que=Nx.Que
 local t={}
 for _,cur in ipairs(Que.CuQ or {}) do
-tinsert(t,tostring(cur.QId or cur.Tit)..(cur.CoM and "c" or ""))
+tinsert(t,tostring(cur.QId or cur.Tit)..((cur.CoM or cur.LBC==0) and "c" or ""))
 end
 sort(t)
 local sig=table.concat(t,",")
