@@ -169,7 +169,7 @@ Nx.OpD={{N="Welcome",1,"Select an options page using the list on the left",},{N=
 },{N="Import Carbonite Nodes Mining locations",F="NXCmdImportCarbMine"
 },1,{N="Import Cartographer Herbalism locations",F="NXCmdImportCartHerb"
 },{N="Import Cartographer Mining locations",F="NXCmdImportCartMine"
-},},{N="Info Windows","Info window options",1,{N="Lock all windows",V="IWinLock",VF="NXCmdInfoWinUpdate",},{N="List background color",V="IWinListCol",VF="NXCmdInfoWinUpdate",},},{N="Map","Map options",1,{N="Maximize Carbonite map instead of opening normal map",V="MapMaxOverride",},{N="Center on selected zone when maximizing",V="MapMaxCenter",},{N="Ignore mouse on maximized map",V="MapMaxMouseIgnore",},{N="Move fullscreen map data into maximized Carbonite map",V="MapWOwn",},{N="Hide maximized map when ESC or map toggle (M) key pressed",V="MapMaxRestoreHide",},1,{N="Show friend and guild positions in city",V="MapShowPalsInCities",},{N="Show other player positions in city",V="MapShowOthersInCities",},{N="Show other player positions in zone",V="MapShowOthersInZ",},1,{N="Restore map scale after tracking cleared",V="MapRestoreScaleAfterTrack",},{N="Use travel routing",V="MapRouteUse",},{N="Show player movement trail",V="MapShowTrail",},{N="Player movement trail dot separation",V="MapTrailDist",},{N="Player movement trail max dot count",V="MapTrailCnt",VF="NXCmdReload"
+},},{N="Info Windows","Info window options",1,{N="Lock all windows",V="IWinLock",VF="NXCmdInfoWinUpdate",},{N="List background color",V="IWinListCol",VF="NXCmdInfoWinUpdate",},},{N="Map","Map options",1,{N="Maximize Carbonite map instead of opening normal map",V="MapMaxOverride",},{N="Center on player when maximizing",V="MapMaxCenter",},{N="Ignore mouse on maximized map",V="MapMaxMouseIgnore",},{N="Move fullscreen map data into maximized Carbonite map",V="MapWOwn",},{N="Hide maximized map when ESC or map toggle (M) key pressed",V="MapMaxRestoreHide",},1,{N="Show friend and guild positions in city",V="MapShowPalsInCities",},{N="Show other player positions in city",V="MapShowOthersInCities",},{N="Show other player positions in zone",V="MapShowOthersInZ",},1,{N="Restore map scale after tracking cleared",V="MapRestoreScaleAfterTrack",},{N="Use travel routing",V="MapRouteUse",},{N="Show player movement trail",V="MapShowTrail",},{N="Player movement trail dot separation",V="MapTrailDist",},{N="Player movement trail max dot count",V="MapTrailCnt",VF="NXCmdReload"
 },{N="Player movement trail fade time (seconds)",V="MapTrailTime",},{N="Player arrow size",V="MapPlyrArrowSize",},{N="Show map tool bar",V="MapShowToolBar",VF="NXCmdMapToolBarUpdate"
 },{N="Location tip anchor",V="MapLocTipAnchor",},{N="Location tip anchor to map",V="MapLocTipAnchorRel",},{N="Show all tool tips above map",V="MapTopTooltip",},{N="Show 'Points of Interest' map icons",V="MapShowPOI",},{N="Icon scale minimum size. -1 disables scaling for Guide and Favorite Icons",V="MapIconScaleMin",},{N="Icon health bar thickness (0 hides)",V="MapLineThick",},{N="Maximum number of zones to draw at a time",V="MapZoneDrawCnt",},{N="Detail graphics visible area",V="MapDetailSize",VF="NXCmdReload"
 },1,"Map window title bar",{N="Show map name",V="MapShowTitleName",},{N="Show coordinates",V="MapShowTitleXY",},{N="Show speed",V="MapShowTitleSpeed",},{N="Show title line 2 (subzone, pvp, xy)",V="MapShowTitle2",VF="NXCmdReload"
@@ -1968,6 +1968,9 @@ elseif szm==1 then
 map:MaS1()
 elseif self.GOp["MapMaxCenter"] then
 map:MaS1()
+end
+if win:ISM() and self.GOp["MapMaxCenter"] then
+map:CePl()
 end
 elseif szm then
 win:Show(false)
@@ -5007,7 +5010,7 @@ self.Win1:ToS1()
 self:SaveView("")
 self:MoE(false)
 if self.GOp["MapMaxCenter"] then
-self:CeM()
+self:CePl()
 end
 self.StT=min(self.StT,1)
 end
@@ -27097,5 +27100,36 @@ return ...
 end
 function Nx.Que:RQL(...)
 return aft(oRQL(self,...))
+end
+end
+function Nx.Map:CePl()
+local ok,err=pcall(function()
+if not self.PlX or(self.PlX==0 and self.PlY==0) then
+self:CeM()
+return
+end
+if self.InI then
+self:Mov(self.PlX,self.PlY,20,30)
+return
+end
+SetMapToCurrentZone()
+local maI=self:GCMI()
+local sca=1.5
+if self:GWZ(maI).Cit then
+sca=1
+end
+self.MaW=self.Frm:GetWidth()-self.PaX*2
+self.MaH=self.Frm:GetHeight()-self.TiH
+local siz=min(self.MaW/1002,self.MaH/668)
+if self.MaW<GetScreenWidth()/2 then
+siz=siz*sca
+end
+self:Mov(self.PlX,self.PlY,siz/self:GWZS(maI)*10.02,30)
+end)
+if not ok then
+if Nx.DLog then
+Nx.DLog("Map center",tostring(err),tostring(err))
+end
+self:CeM()
 end
 end
