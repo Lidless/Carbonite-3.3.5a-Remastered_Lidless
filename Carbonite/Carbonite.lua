@@ -1175,6 +1175,7 @@ self.DPVPI={[11335]="1",[11336]="1",[11337]="1",[11338]="1",[11339]="1",[11340]=
 Nx.Que1=Nx["Quests"] or Nx.Que1
 self.Map=Map:GeM(1)
 local enF=Nx.PFN==1 and 1 or 2
+local qOv=NxData and type(NxData.NXQGOv)=="table" and NxData.NXQGOv
 local qLL=UnitLevel("player")-opt["QLevelsToLoad"]
 local qML=Nx.V30 and 999 or 70
 local qCn=0
@@ -1184,6 +1185,13 @@ for muI,q in pairs(Nx.Que1) do
 local id=(muI+3)/2-7
 qCn=qCn+1
 max2=max(id,max2)
+if qOv and type(q[2])=="string" and #q[2]>1 then
+local o=qOv[strsub(q[2],2,strbyte(q[2],1)-34)]
+if o then
+local n1=strbyte(q[1],1)-35+2
+q[1]=strsub(q[1],1,n1-1)..strchar((o==3 and enF or o)+35)..strsub(q[1],n1+1)
+end
+end
 local nam,sid,lev=self:Unp(q[1])
 if sid==enF or lev>0 and lev<qLL or lev>qML then
 Nx.Que1[muI]=nil
@@ -6722,6 +6730,7 @@ local shC=self.SQGC
 local qId1=Que.QId1
 for nam2,qda in pairs(stz) do
 local nam=strsplit("=",nam2)
+if not Nx.QGHidden(nam) then
 local anD
 local show
 local s=nam
@@ -6786,6 +6795,8 @@ local tx=anD and "Interface\\AddOns\\Carbonite\\Gfx\\Map\\IconExclaimB" or "Inte
 local ico=map:AIP(show and(anD and "!GQD" or "!GQ") or "!GQC",wx,wy,nil,tx)
 map:SIT(ico,s)
 ico.UDQGD=qda
+ico.UDQGN=nam
+end
 end
 end
 end
@@ -11815,6 +11826,7 @@ Nx.Map:GeM(1).Gui:UGF()
 end
 local ite=shM:AdI1(0,"Quests My level minus",fQL,m)
 ite:SeS2(gop,0,80,1,"QMapQuestGiversLowLevel")
+shM:AdI1(0,"Reset Hidden Quest Givers",function() Nx.QGReset() end,m)
 local ite=shM:AdI1(0,"Quests My level plus",fQL,m)
 ite:SeS2(gop,0,10,1,"QMapQuestGiversHighLevel")
 local v=Nx.ChO["QMapShowQuestGivers3"] or 1
@@ -18698,6 +18710,9 @@ end
 function Nx.Que:OGIM(ico,typ)
 self.GIMIC:Show(false)
 self.GIMII:Show(false)
+if self.GIMIH then
+self.GIMIH:Show(false)
+end
 if typ~=3000 then
 return
 end
@@ -18707,6 +18722,10 @@ if ico.UDQGD then
 self.GIMIC:Show()
 self.GIMII:Show()
 self.GIMCD=ico.UDQGD
+self.GIMCN=ico.UDQGN
+if self.GIMIH and ico.UDQGN then
+self.GIMIH:Show()
+end
 self:UGIM()
 end
 end
@@ -24893,6 +24912,8 @@ end
 local inM=Nx.Men:Cre(frm)
 self.GIMI=inM
 self.GIMII=maM:ASM(inM,"Quest Info (click a quest)...")
+self.GIMIH=maM:AdI1(0,"Hide this quest giver",function(self) Nx.QGHide(self.GIMCN,true) end,self)
+self.GIMIH:Show(false)
 self.GIMIIT={}
 for n=1,29 do
 local function fun(self,ite)
@@ -26893,6 +26914,10 @@ for npc,g in pairs(z) do
 local s=npc
 local show
 local onD=true
+if NxData.NXQGHid and NxData.NXQGHid[npc] then
+g=nil
+end
+if g then
 for tit,q in pairs(g.Q) do
 if not don[tit] and not inL[tit] and(sta1~=3 or q.D) then
 local lvl=(q.L and q.L>0) and q.L or lvP
@@ -26914,6 +26939,7 @@ map:SIT(ico,s.."\n|cff808080(learned)|r")
 end
 end
 end
+end
 do
 local f=CreateFrame("Frame")
 f:RegisterEvent("GOSSIP_SHOW")
@@ -26924,6 +26950,105 @@ f:SetScript("OnEvent",function(self,eve)
 local ok,err=pcall(Nx.LGE,eve)
 if not ok and Nx.DLog then
 Nx.DLog("Learned givers",tostring(err),tostring(err))
+end
+end)
+end
+function Nx.QGMyS()
+return Nx.PFN==0 and 1 or 2
+end
+function Nx.QGHidden(nam)
+if not NxData or not nam then
+return
+end
+local h=NxData.NXQGHid
+if h and h[nam] then
+return true
+end
+local ov=NxData.NXQGOv and NxData.NXQGOv[nam]
+if ov and(ov==3 or ov~=Nx.QGMyS()) then
+return true
+end
+end
+function Nx.QGNames()
+local Que=Nx.Que
+if Nx.QGNm or not Que or not Que.QGi then
+return Nx.QGNm
+end
+local t={}
+for _,stz in pairs(Que.QGi) do
+for nam2 in pairs(stz) do
+local nam=strsplit("=",nam2)
+t[nam]=true
+end
+end
+Nx.QGNm=t
+return t
+end
+function Nx.QGTgt()
+if not NxData or not UnitExists("target") or UnitIsPlayer("target") then
+return
+end
+if not UnitCanAttack("player","target") or(UnitReaction("target","player") or 5)>3 then
+return
+end
+local nam=UnitName("target")
+local t=Nx.QGNames()
+if not nam or not t or not t[nam] then
+return
+end
+local ov=NxData.NXQGOv
+if type(ov)~="table" then
+ov={}
+NxData.NXQGOv=ov
+end
+local my=Nx.QGMyS()
+local cur=ov[nam]
+local new
+if not cur then
+new=3-my
+elseif cur==my then
+new=3
+end
+if new then
+ov[nam]=new
+if Nx.DLog then
+Nx.DLog("Quest giver",nam,format("Quest giver %s is hostile to %s, hidden for this faction%s",nam,my==1 and "Alliance" or "Horde",new==3 and " (hostile to both, hidden for all)" or ""))
+end
+local map=Nx.Map:GeM(1)
+if map and map.Gui then
+map.Gui:UGF()
+end
+end
+end
+function Nx.QGHide(nam,hid)
+if not NxData or not nam then
+return
+end
+NxData.NXQGHid=NxData.NXQGHid or {}
+NxData.NXQGHid[nam]=hid or nil
+local map=Nx.Map:GeM(1)
+if map and map.Gui then
+map.Gui:UGF()
+end
+end
+function Nx.QGReset()
+if NxData then
+NxData.NXQGHid=nil
+NxData.NXQGOv=nil
+end
+Nx.prt("Hidden quest givers reset (map quest data refreshes after /reload)")
+local map=Nx.Map:GeM(1)
+if map and map.Gui then
+map.Gui:UGF()
+end
+end
+do
+local f=CreateFrame("Frame")
+f:RegisterEvent("PLAYER_TARGET_CHANGED")
+f:SetScript("OnEvent",function()
+local ok,err=pcall(Nx.QGTgt)
+if not ok and Nx.DLog then
+Nx.DLog("Quest giver check",tostring(err),tostring(err))
 end
 end)
 end
